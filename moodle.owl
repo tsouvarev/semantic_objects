@@ -1,0 +1,536 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE Ontology [
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.semanticweb.org/ontologies/2011/10/Ontology1322456044761.owl"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     ontologyIRI="http://www.semanticweb.org/ontologies/2011/10/Ontology1322456044761.owl">
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Declaration>
+        <Class IRI="#Hot_Potatoes_Quiz"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Автор"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Веб_страница"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Видеолекция"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Заголовок"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Задания"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Календарь"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Неделя"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Новостной_форум"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Обсуждение"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Общий_форум"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Ответ_в_виде_нескольких_файлов"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Ответ_в_виде_текста"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Ответ_в_виде_файла"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Ответ_вне_сайта"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Посещаемость"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Пояснение"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Рабочая_тетрадь"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Ресурс"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Сообщение"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Ссылка_на_веб_страницу"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Ссылка_на_каталог"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Структура"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Текст_сообщения"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Текстовая_страница"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Тема"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Тест"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Формат_курса"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Форум"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Часть_курса"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Элемент_курса"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#Состоит_из"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Автор"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Дата_начала"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Дата_окончания"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Заголовок"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Неделя"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Обсуждение"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Ресурс"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Содержимое"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Сообщение"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Текст_сообщения"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Тема"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#Элемент_курса"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="#Hot_Potatoes_Quiz"/>
+        <Class IRI="#Элемент_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Автор"/>
+        <Class IRI="#Часть_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Веб_страница"/>
+        <Class IRI="#Ресурс"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Видеолекция"/>
+        <Class IRI="#Элемент_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Заголовок"/>
+        <Class IRI="#Часть_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Задания"/>
+        <Class IRI="#Элемент_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Календарь"/>
+        <Class IRI="#Формат_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Неделя"/>
+        <Class IRI="#Часть_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Новостной_форум"/>
+        <Class IRI="#Форум"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Обсуждение"/>
+        <Class IRI="#Часть_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Общий_форум"/>
+        <Class IRI="#Форум"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Ответ_в_виде_нескольких_файлов"/>
+        <Class IRI="#Задания"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Ответ_в_виде_текста"/>
+        <Class IRI="#Задания"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Ответ_в_виде_файла"/>
+        <Class IRI="#Задания"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Ответ_вне_сайта"/>
+        <Class IRI="#Задания"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Посещаемость"/>
+        <Class IRI="#Элемент_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Пояснение"/>
+        <Class IRI="#Ресурс"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Рабочая_тетрадь"/>
+        <Class IRI="#Элемент_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Сообщение"/>
+        <Class IRI="#Часть_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Ссылка_на_веб_страницу"/>
+        <Class IRI="#Ресурс"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Ссылка_на_каталог"/>
+        <Class IRI="#Ресурс"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Структура"/>
+        <Class IRI="#Формат_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Текст_сообщения"/>
+        <Class IRI="#Часть_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Текстовая_страница"/>
+        <Class IRI="#Ресурс"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Тема"/>
+        <Class IRI="#Часть_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Тест"/>
+        <Class IRI="#Элемент_курса"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Форум"/>
+        <Class IRI="#Формат_курса"/>
+    </SubClassOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#Тема"/>
+        <DataProperty abbreviatedIRI=":topDataProperty"/>
+    </SubDataPropertyOf>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Автор"/>
+        <Class IRI="#Автор"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Заголовок"/>
+        <Class IRI="#Заголовок"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Неделя"/>
+        <Class IRI="#Неделя"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Обсуждение"/>
+        <Class IRI="#Обсуждение"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Ресурс"/>
+        <Class IRI="#Ресурс"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Содержимое"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#Содержимое"/>
+        </DataExactCardinality>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Сообщение"/>
+        <Class IRI="#Сообщение"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Текст_сообщения"/>
+        <Class IRI="#Текст_сообщения"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Тема"/>
+        <Class IRI="#Тема"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#Элемент_курса"/>
+        <Class IRI="#Элемент_курса"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#Дата_начала"/>
+        <Datatype abbreviatedIRI="xsd:dateTime"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#Дата_окончания"/>
+        <Datatype abbreviatedIRI="xsd:dateTime"/>
+    </DataPropertyRange>
+    <HasKey>
+        <Class IRI="#Автор"/>
+        <DataProperty IRI="#Содержимое"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Заголовок"/>
+        <DataProperty IRI="#Ресурс"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Заголовок"/>
+        <DataProperty IRI="#Элемент_курса"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Календарь"/>
+        <DataProperty IRI="#Дата_начала"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Календарь"/>
+        <DataProperty IRI="#Дата_окончания"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Календарь"/>
+        <DataProperty IRI="#Неделя"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Неделя"/>
+        <DataProperty IRI="#Ресурс"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Неделя"/>
+        <DataProperty IRI="#Тема"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Неделя"/>
+        <DataProperty IRI="#Элемент_курса"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Обсуждение"/>
+        <DataProperty IRI="#Сообщение"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Обсуждение"/>
+        <DataProperty IRI="#Тема"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Сообщение"/>
+        <DataProperty IRI="#Автор"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Сообщение"/>
+        <DataProperty IRI="#Текст_сообщения"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Структура"/>
+        <DataProperty IRI="#Заголовок"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Текст_сообщения"/>
+        <DataProperty IRI="#Содержимое"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Тема"/>
+        <DataProperty IRI="#Содержимое"/>
+    </HasKey>
+    <HasKey>
+        <Class IRI="#Форум"/>
+        <DataProperty IRI="#Обсуждение"/>
+    </HasKey>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Hot_Potatoes_Quiz</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Hot Potatoes Quiz</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Автор</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Автор</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Веб_страница</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Веб страница</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Видеолекция</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Видеолекция</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Дата_начала</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Дата начала</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Дата_окончания</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Дата окончания</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Заголовок</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Заголовок</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Задания</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Задания</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Календарь</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Календарь</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Обсуждение</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Обсуждение</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Ответ_в_виде_нескольких_файлов</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Ответ в виде нескольких файлов</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Ответ_в_виде_текста</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Ответ в виде текста</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Ответ_в_виде_файла</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Ответ в виде файла</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Ответ_вне_сайта</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Ответ вне сайта</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Посещаемость</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Посещаемость</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Рабочая_тетрадь</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Рабочая тетрадь</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Ресурс</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Ресурс</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Содержимое</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Содержимое</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Сообщение</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Сообщение</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Состоит_из</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Состоит из</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Ссылка_на_веб_страницу</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Ссылка на веб страницу</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Структура</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Структура</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Текст_сообщения</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Текст сообщения</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Тема</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Тема</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Тест</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Тест</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Формат_курса</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Формат курса</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Форум</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Форум</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Часть_курса</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Часть курса</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Элемент_курса</IRI>
+        <Literal xml:lang="en" datatypeIRI="&rdf;PlainLiteral">Элемент курса</Literal>
+    </AnnotationAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 3.2.3.22702) http://owlapi.sourceforge.net -->
+

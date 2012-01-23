@@ -1,0 +1,41 @@
++---------------------------------------------------+-----------------------+
+|	App												|	Comment				|
++---------------------------------------------------+-----------------------+
+|	http://code.google.com/p/surfrdf/				|	neat				|
+|	http://code.google.com/p/django-rdf/			|	not really..		|
+|	https://github.com/66laps/django-4store			|	neat!				|
+|	sparta											|	neat				|
+|	http://code.welldev.org/django-roa/wiki/Home	|	wtf?				|
+|	http://www.cubicweb.org/						|	wtf?				|
+|	http://www.openvest.com/trac/wiki/RDFAlchemy	|	neat?				|
++---------------------------------------------------+-----------------------+
+
+triplestores:
+http://en.wikipedia.org/wiki/Triplestore
+http://en.wikipedia.org/wiki/Category:Semantic_Web
+
+allegrograph python api:
+http://www.franz.com/agraph/support/documentation/current/python-tutorial/python-tutorial-40.html
+http://www.franz.com/agraph/support/documentation/v4/python-tutorial/python-API-40.html
+
+redstore (http rest? api):
+http://www.aelius.com/njh/redstore/
+
+openrdf (java, sesame, http access):
+http://www.openrdf.org/index.jsp
+pySesame 
+access via surf plugin
+
+virtuoso (wtf?):
+(virtuoso as rdflib store) http://packages.python.org/virtuoso/rdflib.html
+http://virtuoso.openlinksw.com/
+
+4store (neat, rest api, no oop bindings):
+http://www.4store.org/
+(python client) http://4store.org/trac/wiki/ClientLibraries
+(django app) https://github.com/66laps/django-4store
+
+swiftowlim (rest api as in sesame http://www.openrdf.org/doc/sesame2/system/ch08.html):
+http://owlim.ontotext.com/display/OWLIMv35/SwiftOWLIM+Fact+Sheet
+(sail api) http://www.openrdf.org/doc/sesame2/system/ch05.html
+http://www.ontotext.com/owlim
