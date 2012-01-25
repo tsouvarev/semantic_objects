@@ -6,6 +6,8 @@ import surf.namespace as ns
 from rdflib import *
 import SPARQLWrapper as wrap
 from SPARQLWrapper import SPARQLWrapper, JSON
+from surf.rdf import URIRef
+#from SPARQLWrapper.Wrapper import POST
 
 #f = open ("moodle.rdf", "w")
 
@@ -16,60 +18,52 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 
 #f.close()
 
-#ns.register (wines = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
+store = surf.Store(	reader = 'sparql_protocol',
+					writer = 'sparql_protocol',
+                   	endpoint = 'http://fourstore.avalon.ru/sparql/'
+                   	)
 
-#c = session.get_class (ns.WINES + "VintageYear")
-#r = c (ns.WINES + "Year1998")
+ns.register (wines = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
+session = surf.Session(store)
 
-#print r["yearValue"]#["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine_YearValue"]
+#q = session.default_store.add_triple(*map (URIRef, ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Test",
+#									  "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+#									  "http://www.w3.org/2002/07/owl#Class")))
+# q = session.default_store.add_triple(*map (URIRef, ("WINES:Test", "RDF:type", "OWL:Class")))
+#"""
+#INSERT DATA 
+#{ <http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> }""")# % (ns.WINES + "Chianti"))
 
-#store = surf.Store(reader = "rdflib",writer = "rdflib",rdflib_store = "IOMemory")
-#store = surf.Store(reader = 'sparql_protocol',
-#					writer = 'sparql_protocol',
-#                   endpoint = 'http://fourstore.avalon.ru:80/sparql'
-#                   #default_graph = 'wine'
-#                   )
+#print q#["results"]["bindings"]
 
-#store.load_triples()
-#store.load_triples(source = "moodle.owl")#"http://www.w3.org/People/Berners-Lee/card.rdf")
-#session = surf.Session(store)
-#q = session.default_store.execute_sparql("SELECT ?s ?p ?o WHERE { ?s ?p ?o }")
+#for r in q["results"]["bindings"]: print r["s"]["value"]
 
-#print list(q)#session.default_store.size()
+c = session.get_class (ns.WINES + "Burgundy")
+#for i in c.all(): print i
 
-#ns.register (wine = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
+r = session.get_resource (ns.WINES+"WhiteBurgundy", c)
+#r.load()
+#r.hasSugar = "Yes"
+#print r.hasSugar
+#r.save ()
+r.remove()
 
-#c = session.get_class (ns.WINE + "Wine")#s.encode('utf-8'))
-#print c.all().first()
+#for rr in r.rdfs_subClassOf: 
 
-#print session.default_store.size()
+#	rr.load()
+#	print rr.__dict__
 
-#store.close()
-
-##########sparql = SPARQLWrapper("http://dbpedia.org/sparql")
-##########sparql.setQuery("""
-##########    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-##########    SELECT ?label
-##########    WHERE { <http://dbpedia.org/resource/Asturias> rdfs:label ?label }
-##########""")
-##########sparql.setReturnFormat(JSON)
-##########results = sparql.query().convert()
-
-##########for result in results["results"]["bindings"]:
-##########    print result["label"]["value"].encode ("utf-8")
-
-#wget fourstore.avalon.ru/sparql --post-data 'query=SELECT+%2A+WHERE+%7B+%3Fs+%3Fp+%3Fo+%7D'
-
-sparql = SPARQLWrapper("http://fourstore.avalon.ru:80/sparql") # fourstore.avalon.ru:80
-sparql.setQuery("SELECT * WHERE { ?s ?p ?o }")
-sparql.setReturnFormat(JSON)
-results = sparql.query()
-
-print results
-
-for result in results:#["results"]["bindings"]:
-    print result#["s"]["value"].encode ("utf-8")
-
+#years = session.get_class(ns.WINES+ "VintageYear")
+#years_insts = years.all()
+#print 'all years'
+#for y in years_insts: print y
+#print 'first year'
+#fy = years_insts.order().first()
+#print fy
+#print 'years count: %s' % len(years_insts)
+#print 'test get_by'
+#print fy.wines_yearValue
+#print len(years.filter(wines_yearValue = "1998"))
 
 
 
