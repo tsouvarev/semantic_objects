@@ -19,7 +19,7 @@ from surf.rdf import URIRef
 #f.close()
 
 store = surf.Store(	reader = 'sparql_protocol',
-					writer = 'sparql_protocol',
+			writer = 'sparql_protocol',
                    	endpoint = 'http://fourstore.avalon.ru/sparql/'
                    	)
 
