@@ -19,9 +19,9 @@ from surf.rdf import URIRef
 #f.close()
 
 store = surf.Store(	reader = 'sparql_protocol',
-			writer = 'sparql_protocol',
-                   	endpoint = 'http://fourstore.avalon.ru/sparql/'
-                   	)
+			#writer = 'sparql_protocol'
+			endpoint = 'http://fourstore.avalon.ru/sparql/'
+			)
 
 ns.register (wines = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
 session = surf.Session(store)
@@ -39,19 +39,18 @@ session = surf.Session(store)
 #for r in q["results"]["bindings"]: print r["s"]["value"]
 
 c = session.get_class (ns.WINES + "Burgundy")
-#for i in c.all(): print i
+for i in c.all(): print i
 
 r = session.get_resource (ns.WINES+"WhiteBurgundy", c)
-#r.load()
+r.load()
 #r.hasSugar = "Yes"
-#print r.hasSugar
 #r.save ()
 r.remove()
 
-#for rr in r.rdfs_subClassOf: 
+for rr in r.rdfs_subClassOf: 
 
-#	rr.load()
-#	print rr.__dict__
+	rr.load()
+	print rr.__dict__
 
 #years = session.get_class(ns.WINES+ "VintageYear")
 #years_insts = years.all()
