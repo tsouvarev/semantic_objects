@@ -43,9 +43,6 @@ for i in c.all(): print i
 
 r = session.get_resource (ns.WINES+"WhiteBurgundy", c)
 r.load()
-#r.hasSugar = "Yes"
-#r.save ()
-r.remove()
 
 for rr in r.rdfs_subClassOf: 
 
