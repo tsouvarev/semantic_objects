@@ -1,0 +1,19 @@
+sub: bc01000000000030
+prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn
+val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ChiantiRegion
+
+sub: bc01000000000032
+prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#madeFromGrape
+val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#SangioveseGrape
+
+sub: bd01000000000034
+prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasSugar
+val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Dry
+
+sub: bc01000000000031
+prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasColor
+val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Red
+
+sub: bc01000000000033
+prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor
+val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Moderate
