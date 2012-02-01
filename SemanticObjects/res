@@ -1,19 +1,19 @@
-sub: bc01000000000030
-prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn
-val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ChiantiRegion
+s: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#WhiteBordeaux
+p: http://www.w3.org/2002/07/owl#intersectionOf
+o: b800000000000021
 
-sub: bc01000000000032
-prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#madeFromGrape
-val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#SangioveseGrape
+s: b800000000000021
+p: http://www.w3.org/1999/02/22-rdf-syntax-ns#first
+o: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Bordeaux
 
-sub: bd01000000000034
-prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasSugar
-val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Dry
+s: b800000000000021
+p: http://www.w3.org/1999/02/22-rdf-syntax-ns#rest
+o: b800000000000022
 
-sub: bc01000000000031
-prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasColor
-val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Red
+s: b800000000000022
+p: http://www.w3.org/1999/02/22-rdf-syntax-ns#first
+o: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#WhiteWine
 
-sub: bc01000000000033
-prop: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor
-val: http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Moderate
+s: b800000000000022
+p: http://www.w3.org/1999/02/22-rdf-syntax-ns#rest
+o: http://www.w3.org/1999/02/22-rdf-syntax-ns#nil
