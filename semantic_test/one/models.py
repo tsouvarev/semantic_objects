@@ -44,7 +44,6 @@ class SemanticManager (Manager):
 		self.qs = SemanticQuerySet()
 		self.s = SemanticObjects ("http://fourstore.avalon.ru/sparql/")
 		self.s.add_namespace (ns, namespace)
-		#self.__class__.__name__
          
 	def get_query_set(self):
 	
@@ -52,13 +51,11 @@ class SemanticManager (Manager):
 
 	def all (self):
 
-		print self.ns + ":" + self.uri
-		
 		return self.s.get_resources (self.ns + ":" + self.uri)
 
 class Chianti (Model):
 
-	uri = "Chardonnay"
+	uri = "Chianti"
 	namespace = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#"
 	ns = "wines"
 	hasMaker = CharField (max_length = 20)

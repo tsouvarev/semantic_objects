@@ -19,6 +19,8 @@ class SemanticObjects ():
 		self.prefixes = ""
 		self.ns = {}
 		self.namespaces = self.ns
+		
+		self.bases = {}
 
 		self.ns["owl"] = "http://www.w3.org/2002/07/owl#"
 		self.ns["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#"
@@ -90,7 +92,7 @@ class SemanticObjects ():
 		t = uri.rsplit ("#")
 		name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
 
-		c = {}
+		props = {}
 		
 #		{ 
 #							%s a owl:Class ; 
@@ -120,11 +122,7 @@ class SemanticObjects ():
 					
 		for q in queries: 
 			#print self.print_results (self.get_query (q))
-			c.update (self.convert (self.get_query (q), [("prop", "val",)]))
-		
-#		def setter (self,key,value): self.__dict__[key] = value
-#		
-#		c["__setitem__"] = setter
+			props.update (self.convert (self.get_query (q), [("prop", "val",)]))
 		
 		q = """
 				select ?class 
@@ -160,29 +158,27 @@ class SemanticObjects ():
 #		print uri
 #		self.print_results (self.get_query (q))
 		
-		base = []
-		
 #		print 
 		
 		for i in self.convert (self.get_query (q), [("classes", ["class"], )])["classes"]: 
-			base.append (self.get_class ("wines:" + i))
+			
+			if i not in self.bases:
+			
+				self.bases[i] = self.get_class ("wines:" + i)
 		
-		r = type (str(name), tuple (base), c)
+		r = type (str(name), tuple (self.bases.values()), props)
 		r.uri = uri
 		
-		def unicode (self):
-		
-			return u"" + self.uri
-		
-		r.__repr__ = unicode
+ 		r.__repr__ = lambda self: u"" + self.uri
+ 		
+#		print
 #		print r
 #		print dir(r)
 #		print r.__mro__
 #		print r.__dict__
-#		print
+
 #			
-		return r #tuple (c["classes"]) нужно, чтобы все базовые классы были уже созданы
-		# видимо, нужен рекурсивный обход
+		return r
 	
 	def get_resources (self, class_uri):
 
