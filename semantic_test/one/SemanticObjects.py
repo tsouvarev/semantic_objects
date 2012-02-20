@@ -173,7 +173,7 @@ class SemanticObjects ():
  		
 #		print
 #		print r
-#		print dir(r)
+#		print cd dir(r)
 #		print r.__mro__
 #		print r.__dict__
 
@@ -238,31 +238,9 @@ class SemanticObjects ():
 	def test (self):
 	
 		self.add_namespace ("wines", "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
-	
-#		class A(): pass
-#		class B(): pass
-
-#		C = type ("C", (A,B,object), {"hasMaker": None})
-#	
-#		print C.__bases__
-#		r = self.get_class ("wines:WhiteBordeaux")
-#		a = r()
-#		print dir(a)
-
-#		r = self.get_resource ("wines:ChiantiClassico")
-#		print r.__dict__
-#		print
-#		for i in r.__dict__: print str(i) + ": " + r.__dict__[i]
-#		print r.madeFromGrape
 		
 		r = self.get_resources ("wines:Chianti")
 		for rr in r: print rr.uri
-		
-#		r2 = self.get_class ("wines:Sancerre")
-#		
-#		#self.print_results (r)
-#		print r.__dict__
-#		print r2.__dict__
 			
 
 						

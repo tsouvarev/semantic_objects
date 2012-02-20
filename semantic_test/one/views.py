@@ -11,5 +11,6 @@ def test(req):
 	
 	a = Chianti.objects.all()
 	print dumps (a[0].__dict__)
+	print a[0].hasFlavor
 
 	return HttpResponse ("yay!<br>res: %s" % a)

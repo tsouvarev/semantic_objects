@@ -1,13 +1,15 @@
 from django.db.models import *
 from django.db.models.query import QuerySet
 from SemanticObjects import *
+
 # Create your models here.
 
 class SemanticQuerySet (QuerySet):
 
-	def __init__(self):
+	def __init__(self, model = None):
 
 		super(SemanticQuerySet, self).__init__()
+		
 		
 	def filter (self, **kwargs):
 	
@@ -42,6 +44,7 @@ class SemanticManager (Manager):
 		self.ns = ns
 		self.uri = uri
 		self.qs = SemanticQuerySet()
+		print "qs: " + str (self.qs.__dict__)
 		self.s = SemanticObjects ("http://fourstore.avalon.ru/sparql/")
 		self.s.add_namespace (ns, namespace)
          
