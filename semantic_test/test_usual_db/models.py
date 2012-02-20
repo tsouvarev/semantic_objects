@@ -1,4 +1,4 @@
-from django.db.models import Model
+from django.db.models import Model, CharField, IntegerField
 
 # Create your models here.
 
