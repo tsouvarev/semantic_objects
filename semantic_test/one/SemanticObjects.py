@@ -170,6 +170,7 @@ class SemanticObjects ():
 		r.uri = uri
 		
  		r.__repr__ = lambda self: u"" + self.uri
+ 		r.__str__ = lambda self: u"" + self.uri
  		
 #		print
 #		print r

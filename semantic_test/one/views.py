@@ -10,11 +10,15 @@ def test(req):
 
 	w = Chianti()	
 	#Book (name = "Discworld", store = "Dom knig", num = 100).save()
-	print Book.objects.all()[0]
-	
-	
-	a = Chianti.objects.all()
-	print dumps (a[0].__dict__)
-	print a[0].hasFlavor
+#	print type ()
+#	print dir (Book.objects.all())
+#	
+#	
+	html = ""
+	html += "%s<br><br>" %  Chianti.objects.all()[0]
+	print 
+	html += "%s<br>" % dir (Book.objects)
+#	print dumps (a[0].__dict__)
+#	print a[0].hasFlavor
 
-	return HttpResponse ("yay!<br>res: %s" % a)
+	return HttpResponse (html)
