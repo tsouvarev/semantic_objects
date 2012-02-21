@@ -1,4 +1,6 @@
-# Create your views here.
+#! /bin/python
+# -*- coding: utf-8 -*-
+
 
 #from django.db.models import Manager
 from django.http import HttpResponse

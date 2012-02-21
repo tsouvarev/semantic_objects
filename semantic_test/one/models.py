@@ -1,3 +1,6 @@
+#! /bin/python
+# -*- coding: utf-8 -*-
+
 from django.db.models import *
 from django.db.models.query import QuerySet
 from SemanticObjects import *
@@ -16,6 +19,7 @@ class SemanticQuerySet (QuerySet):
 		self.ns = ns
 		self.uri = uri
 		
+		# получаем все экземпляры класса
 		self.resources = self.s.get_resources (self.ns + ":" + self.uri)
 		
 	def __repr__ (self):
@@ -59,6 +63,7 @@ class SemanticQuerySet (QuerySet):
 #	
 #		return None
 
+# менеджер семантического репозитария
 class SemanticManager (Manager):
 
 	def __init__(self, namespace, ns, uri):
@@ -73,7 +78,7 @@ class SemanticManager (Manager):
 	
 		return SemanticQuerySet (self.model, self.uri, self.ns, self.namespace)
 	
-
+# описываем модель, по которой будем получать данные из онтологии
 class Chianti (Model):
 
 	uri = "Winery"
