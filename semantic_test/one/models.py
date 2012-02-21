@@ -17,7 +17,6 @@ class SemanticQuerySet (QuerySet):
 		self.uri = uri
 		
 		self.resources = self.s.get_resources (self.ns + ":" + self.uri)
-		print type (self.resources[0])
 		
 	def __repr__ (self):
 	
@@ -31,6 +30,10 @@ class SemanticQuerySet (QuerySet):
 	
 		if -1 < k < len (self.resources): return self.resources[k]
 		else: return None
+		
+	def __len__ (self):
+	
+		return len (self.resources)
 	
 #	def filter (self, **kwargs):
 #	
@@ -70,10 +73,7 @@ class SemanticManager (Manager):
 	
 		return SemanticQuerySet (self.model, self.uri, self.ns, self.namespace)
 	
-	def all (self):
 
-		return SemanticQuerySet (self.model, self.uri, self.ns, self.namespace)
-		
 class Chianti (Model):
 
 	uri = "Winery"

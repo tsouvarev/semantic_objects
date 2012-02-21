@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from one.models import *
 from test_usual_db.models import Book
 from json import dumps
+from django.utils.html import escape
 
 def test(req):
 
@@ -14,10 +15,14 @@ def test(req):
 #	print dir (Book.objects.all())
 #	
 #	
-	html = ""
-	html += "%s<br><br>" %  Chianti.objects.all()[0]
-	print 
-	html += "%s<br>" % dir (Book.objects)
+
+	
+	html = "m: %s<br><br>" % escape (type (Chianti.objects))
+	
+	for obj in Chianti.objects.all():
+	
+		html += "%s " % obj
+
 #	print dumps (a[0].__dict__)
 #	print a[0].hasFlavor
 
