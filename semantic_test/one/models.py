@@ -38,10 +38,32 @@ class SemanticQuerySet (QuerySet):
 	def __len__ (self):
 	
 		return len (self.resources)
+		
+	def filter (self, **kwargs):
 	
-#	def filter (self, **kwargs):
-#	
-#		return None
+		print kwargs
+	
+		res = list (self.resources)
+		
+		for attr in kwargs:
+			
+			tmp = []
+			
+			for obj in res:
+				
+				if hasattr (obj, attr) and obj[attr] == kwargs[attr]: tmp.append (obj)
+				
+			res = tmp			
+	
+		return res
+	
+	def get (self, **kwargs):
+	
+		t = self.filter (**kwargs)
+		
+		print "t: " % t
+	
+		return t[0] if len(t)>0 else []
 #		
 #	def exclude (self, **kwargs):
 #	
@@ -81,7 +103,7 @@ class SemanticManager (Manager):
 # описываем модель, по которой будем получать данные из онтологии
 class Chianti (Model):
 
-	uri = "Winery"
+	uri = "Zinfandel" # вызывает фейл: "DryRedWine"
 	namespace = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#"
 	ns = "wines"
 	hasMaker = CharField (max_length = 20)

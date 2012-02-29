@@ -139,16 +139,28 @@ class SemanticObjects ():
 						union
 						{					
 							%s a owl:Class ;
+							?prop ?val .
+							?prop a rdf:Property
+						}
+						union
+						{					
+							%s a owl:Class ;
 							owl:intersectionOf (?f [ owl:onProperty ?prop; owl:hasValue ?val])
-						}						
+						}		
+						union
+						{					
+							%s a owl:Class ;
+							owl:intersectionOf ( ?class [ owl:onProperty ?prop; owl:hasValue ?val] ?b ) .
+							?class a owl:Class
+						}
 					}
-					""" % ((uri,)*2)
+					""" % ((uri,)*4)
 					]
 
 		# добавляем найденные свойства в словарь, понадобится при создании класса
 		for q in queries: 
 			props.update (self.convert (self.get_query (q), [("prop", "val",)]))
-		
+				
 		# запрос на определение родительских классов
 		q = """
 				select ?class 
@@ -162,7 +174,13 @@ class SemanticObjects ():
 					union
 					{					
 						%s a owl:Class ;
-						owl:intersectionOf (?class [ owl:onProperty ?prop; owl:hasValue ?val]) .
+						owl:intersectionOf ( ?class ?a ) .
+						?class a owl:Class
+					}
+					union
+					{					
+						%s a owl:Class ;
+						owl:intersectionOf ( ?class ?a ?b ) .
 						?class a owl:Class
 					}
 					union
@@ -179,7 +197,7 @@ class SemanticObjects ():
 						?class a owl:Class .
 						?x a owl:Class
 					}
-				}""" % ((uri,)*4)
+				}""" % ((uri,)*5)
 		
 		# сразу заполняем кэш классов, если класс еще не встречался
 		# TODO: если кэш не сбрасывается между запросами, 
@@ -197,14 +215,26 @@ class SemanticObjects ():
  		r.__repr__ = lambda self: u"" + self.uri
  		r.__str__ = lambda self: u"" + self.uri
  		
+
+ 		def get (self, key):
+			
+			# обход всего дерева наследования в поиске атрибута 			
+ 			for cls in [self] + list (self.__class__.__mro__):
+ 			
+ 				if hasattr (cls,key): return cls.__dict__[key] 					
+ 			
+ 			return None
+ 			
+ 		r.__getitem__ = get
+ 		
 		return r
 	
 	# функция получения экземпляров 
 	# class_uri - идентификатор класса экземпляров
 	def get_resources (self, class_uri):
 
-		t = self.get_class (class_uri)
-				
+		#t = self.get_class (class_uri)
+		
 		q = """
 				select ?inst
 				where
@@ -220,9 +250,7 @@ class SemanticObjects ():
 		
 		for inst in instances:
 		
-			i = t()
-			i.uri = inst
-			res.append (i)
+			res.append (self.get_resource ("wines:" + inst)) # TODO: hardcoded ns!!!
 			
 		return res
 	
@@ -254,10 +282,11 @@ class SemanticObjects ():
 		
 		r = t()
 		
+		r.uri = uri
 		query = self.convert (self.get_query (q), [("p", "o", )])
 		
 		# добавляем в созданный экземпляр найденные свойства
-		for i in query: r.__dict__[i] = query[i]
+		for i in query: r.__dict__[i] = query[i]		
 			
 		return r
 	
