@@ -4,36 +4,39 @@
 
 #from django.db.models import Manager
 from django.http import HttpResponse
-from one.models import *
+from one.models import Factory
 from test_usual_db.models import Book
 from json import dumps
 from django.utils.html import escape
 
 def test(req):
 
-	w = Chianti()	
+#	w = Chianti()	
 	#Book (name = "Discworld", store = "Dom knig", num = 100).save()
 #	print type ()
 #	print dir (Book.objects.all())
 #	
 #	
-
+	Chardonnay = Factory ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
+	t = Chardonnay.objects.all ()
 	
-	html = "m: %s<br><br>" % escape (type (Chianti.objects))
-	t = Chianti.objects.all ()
+	html = "m: %s<br><br>" % escape (type (Chardonnay.objects))
 	
+	html += "len: %s<br><br>" % len (t)
 #	if type (t) is list:
 	for obj in t:
 
 		x = obj
 	
-		html += "%s<br>" % (escape (x))
+		html += "%s<br>" % (escape (x.uri))
+		html += "%s<br>" % (escape (type(x)))
+		html += "%s<br><br>" % (escape (x.__class__.__mro__))
 	
 #		for p in x.__dict__:
 #		
 #			html += "%s: <br>" % (x[p])
 	
-		html += "<br>"
+#		html += "<br>"
 			
 #	else:
 #	

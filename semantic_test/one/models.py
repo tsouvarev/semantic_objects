@@ -9,7 +9,7 @@ from SemanticObjects import *
 
 class SemanticQuerySet (QuerySet):
 
-	def __init__(self, model, uri, ns, namespace):
+	def __init__(self, model, uri):
 		
 		super(SemanticQuerySet, self).__init__(model)
 		
@@ -88,23 +88,60 @@ class SemanticQuerySet (QuerySet):
 # менеджер семантического репозитария
 class SemanticManager (Manager):
 
-	def __init__(self, namespace, ns, uri):
+	def __init__(self, uri):
 
 		super(SemanticManager, self).__init__()
 		
-		self.namespace = namespace
-		self.ns = ns
+#		self.namespace = namespace
+#		self.ns = ns
 		self.uri = uri	
 		
 	def get_query_set (self):
 	
-		return SemanticQuerySet (self.model, self.uri, self.ns, self.namespace)
+		return SemanticQuerySet (self.model, self.uri)
 	
 # описываем модель, по которой будем получать данные из онтологии
-class Chianti (Model):
+class Factory ():
 
-	uri = "http://www.w3.org/2002/07/owl#Class"#"http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Winery"#"Zinfandel" # вызывает фейл: "DryRedWine"
-	namespace = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#" #"http://www.w3.org/2002/07/owl#"#
-	ns = "wines"
-	objects = SemanticManager(namespace, ns, uri)
+#	uri = "http://www.w3.org/2002/07/owl#Class"
+#	uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay"#"Zinfandel" # вызывает фейл: "DryRedWine"
+#	namespace = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#" #"http://www.w3.org/2002/07/owl#"#
+#	ns = "wines"
+	
+	def __new__ (self):
+	
+		t = uri.rsplit ("#")
+		name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
+	
+		return type (name, (), {})
+	
+	def __init__ (self, uri):
+	
+		self.objects = SemanticManager (uri)
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	

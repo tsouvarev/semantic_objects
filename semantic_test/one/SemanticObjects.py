@@ -226,7 +226,7 @@ class SemanticObjects ():
 		# то почему в иерархии наследования для конкретного класса нет лишних классов?
 		for i in self.convert (self.get_query (q), [("classes", ["class"], )])["classes"]: 
 			
-			if i not in self.bases: 
+			if i not in self.classes: 
 				self.classes[i] = self.get_class (i)
 		
 			bases.append (self.classes[i])
