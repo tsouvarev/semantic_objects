@@ -20,24 +20,24 @@ def test(req):
 
 	
 	html = "m: %s<br><br>" % escape (type (Chianti.objects))
-	t = Chianti.objects.get(hasSugar = "Dry", hasBody = "Full")
+	t = Chianti.objects.all ()
 	
-	if type (t) is list:
-		for obj in t:
+#	if type (t) is list:
+	for obj in t:
+
+		x = obj
 	
-			x = obj
-		
-			html += "%s<br>" % (escape (x))
-		
-	#		for p in x.__dict__:
-	#		
-	#			html += "%s: <br>" % (x[p])
-		
-			html += "<br>"
+		html += "%s<br>" % (escape (x))
+	
+#		for p in x.__dict__:
+#		
+#			html += "%s: <br>" % (x[p])
+	
+		html += "<br>"
 			
-	else:
-	
-		html += "%s<br><br>" % t.uri
+#	else:
+#	
+#		html += "%s<br><br>" % t.uri
 #	print dumps (a[0].__dict__)
 #	print a[0].hasFlavor
 

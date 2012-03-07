@@ -14,13 +14,13 @@ class SemanticQuerySet (QuerySet):
 		super(SemanticQuerySet, self).__init__(model)
 		
 		self.s = SemanticObjects ("http://fourstore.avalon.ru/sparql/")
-		self.s.add_namespace (ns, namespace)
-		
-		self.ns = ns
+		#self.s.add_namespace (ns, namespace)
+		#self.s.add_namespace ("wines", "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
+		#self.ns = ns
 		self.uri = uri
 		
 		# получаем все экземпляры класса
-		self.resources = self.s.get_resources (self.ns + ":" + self.uri)
+		self.resources = self.s.get_resources (self.uri)
 		
 	def __repr__ (self):
 	
@@ -103,9 +103,8 @@ class SemanticManager (Manager):
 # описываем модель, по которой будем получать данные из онтологии
 class Chianti (Model):
 
-	uri = "Zinfandel" # вызывает фейл: "DryRedWine"
-	namespace = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#"
+	uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Winery"#"Zinfandel" # вызывает фейл: "DryRedWine"
+	namespace = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#" #"http://www.w3.org/2002/07/owl#"#
 	ns = "wines"
-	hasMaker = CharField (max_length = 20)
 	objects = SemanticManager(namespace, ns, uri)
 	

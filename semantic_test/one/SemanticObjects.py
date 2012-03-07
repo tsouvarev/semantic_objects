@@ -23,7 +23,7 @@ class SemanticObjects ():
 		
 		# список базовых классов, понадобится при запросах классов и ресурсов из хранилища
 		# также играет роль кэша классов
-		self.bases = {}
+		self.classes = {}
 
 		# заранее добавляем пространства, которые точно понадобятся
 		self.ns["owl"] = "http://www.w3.org/2002/07/owl#"
@@ -80,7 +80,7 @@ class SemanticObjects ():
 	# записать его в итоговый объект как атрибут "a"
 	# кортеж ("a", ["b","c"]) означает взять из properties все свойства под названиями "b" и "c" и
 	# записать их в один список под названием "a"
-	def convert (self, properties, schema):
+	def convert (self, properties, schema, split = False):
 
 		c = {}
 
@@ -97,8 +97,13 @@ class SemanticObjects ():
 
 					if p["type"] != "bnode" and v["type"] != "bnode":
 
-						p = p["value"].rsplit ("#")[1]
-						v = v["value"].rsplit ("#")[1]
+						p = p["value"]
+						v = v["value"]
+						
+						if split:
+							p = p.rsplit ("#")[1]
+							v = v.rsplit ("#")[1]
+							
 						c[p] = v
 
 			elif type(val) == list:
@@ -109,90 +114,107 @@ class SemanticObjects ():
 
 					for n in val:
 
-						if p[n]["type"] != "bnode": c[name].append (p[n]["value"].rsplit("#")[1])
+						if p[n]["type"] != "bnode": 
+						
+							v = p[n]["value"]
+						
+							if split: v = v.rsplit("#")[1]
+							
+							c[name].append (v)
 
 		return c
 
-	# функция создания классов по URI
-	def get_class (self, uri):
-
-		# выделяем название класса из URI
-		# может быть в виде smth#name или smth:name
-		# первое есть традиционная форма записи, вторая принята в SPARQL-запросах
-		t = uri.rsplit ("#")
-		name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
-
-		props = {}
-
+	def get_class_properties (self, uri):
+	
 		# запрос на определение свойств класса в нем же непосредственно определенных
 		# (не из иерархии классов)
-		queries = ["""
-					select ?prop ?val
-					where 
-					{
-						{ 
-							%s a owl:Class ; 
-							?rel ?sub . 
-							?sub owl:onProperty	?prop ;
-						 		 owl:hasValue ?val
-						}
-						union
-						{					
-							%s a owl:Class ;
-							?prop ?val .
-							?prop a rdf:Property
-						}
-						union
-						{					
-							%s a owl:Class ;
-							owl:intersectionOf (?f [ owl:onProperty ?prop; owl:hasValue ?val])
-						}		
-						union
-						{					
-							%s a owl:Class ;
-							owl:intersectionOf ( ?class [ owl:onProperty ?prop; owl:hasValue ?val] ?b ) .
-							?class a owl:Class
-						}
+		q = """
+				select ?prop ?val
+				where 
+				{
+					{ 
+						<%s> a owl:Class ; 
+						?rel ?sub . 
+						?sub owl:onProperty	?prop ;
+					 		 owl:hasValue ?val
 					}
-					""" % ((uri,)*4)
-					]
-
+					union
+					{					
+						<%s> a owl:Class ;
+						?prop ?val .
+						?prop a rdf:Property
+					}
+					union
+					{					
+						<%s> a owl:Class ;
+						owl:intersectionOf (?f [ owl:onProperty ?prop; owl:hasValue ?val])
+					}		
+					union
+					{					
+						<%s> a owl:Class ;
+						owl:intersectionOf ( ?class [ owl:onProperty ?prop; owl:hasValue ?val] ?b ) .
+						?class a owl:Class
+					}
+				}
+				""" % ((uri,)*4)
+		
 		# добавляем найденные свойства в словарь, понадобится при создании класса
-		for q in queries: 
-			props.update (self.convert (self.get_query (q), [("prop", "val",)]))
+		props = self.convert (self.get_query (q), [("prop", "val",)])
+		
+		return props
+		
+	def get_resource_properties (self, uri):
+	
+		# запрашиваем свойства ресурса из онтологии
+		q = """
+				select *
+				where
+				{
+					<%s> ?p ?o .
+					FILTER (?p != rdf:type)
+				}
+			""" % uri
 				
+		props = self.convert (self.get_query (q), [("p", "o", )])
+		
+		return props
+
+	def get_class_superclasses (self, uri):
+	
+		bases = []
+	
 		# запрос на определение родительских классов
 		q = """
 				select ?class 
 				where 
 				{ 
 					{
-						%s a owl:Class ; 
+						<%s> a owl:Class ; 
 						rdfs:subClassOf ?class .
 						?class a owl:Class
 					}
 					union
 					{					
-						%s a owl:Class ;
+						<%s> a owl:Class ;
 						owl:intersectionOf ( ?class ?a ) .
 						?class a owl:Class
 					}
 					union
 					{					
-						%s a owl:Class ;
+						<%s> a owl:Class ;
 						owl:intersectionOf ( ?class ?a ?b ) .
 						?class a owl:Class
 					}
 					union
 					{
-						%s a owl:Class ;
+						<%s> a owl:Class ;
 						owl:intersectionOf ( ?class ?x ) .
 						?class a owl:Class .
 						?x a owl:Class
 					}												
 					union
 					{
-						%s a owl:Class ;
+						<%s> a owl:Class ;
 						owl:intersectionOf ( ?x ?class ) .
 						?class a owl:Class .
 						?x a owl:Class
@@ -204,20 +226,36 @@ class SemanticObjects ():
 		# то почему в иерархии наследования для конкретного класса нет лишних классов?
 		for i in self.convert (self.get_query (q), [("classes", ["class"], )])["classes"]: 
 			
-			if i not in self.bases:
+			if i not in self.bases: 
+				self.classes[i] = self.get_class (i)
+		
+			bases.append (self.classes[i])
 			
-				self.bases[i] = self.get_class ("wines:" + i)
+		return bases
+
+	# функция создания классов по URI
+	def get_class (self, uri):
+
+		if uri in self.classes: return self.classes[uri]
 		
+		# выделяем название класса из URI
+		# может быть в виде smth#name или smth:name
+		# первое есть традиционная форма записи, вторая принята в SPARQL-запросах
+		t = uri.rsplit ("#")
+		name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
+		
+		props = {} #self.get_class_properties (uri)
+		bases = self.get_class_superclasses (uri)
+	
 		# создаем новый тип, который потом и вернем
-		r = type (str(name), tuple (self.bases.values()), props)
+		r = type (str(name), tuple (bases), props)
 		r.uri = uri
-		
+	
  		r.__repr__ = lambda self: u"" + self.uri
  		r.__str__ = lambda self: u"" + self.uri
  		
-
  		def get (self, key):
-			
+		
 			# обход всего дерева наследования в поиске атрибута 			
  			for cls in [self] + list (self.__class__.__mro__):
  			
@@ -226,6 +264,10 @@ class SemanticObjects ():
  			return None
  			
  		r.__getitem__ = get
+ 		r.__getattr__ = get
+# 		r.__getattribute__ = get
+ 		
+ 		self.classes[uri] = r
  		
 		return r
 	
@@ -235,13 +277,15 @@ class SemanticObjects ():
 
 		#t = self.get_class (class_uri)
 		
+		print class_uri
+		
 		q = """
 				select ?inst
 				where
 				{
-					?inst a %s
+					?inst a <%s>
 				}
-			""" % ((class_uri,)*1)
+			""" % class_uri
 		
 		# список названий всех экземпляров из онтологии
 		instances = self.convert (self.get_query (q), [("inst", ["inst"], )])["inst"]
@@ -250,44 +294,35 @@ class SemanticObjects ():
 		
 		for inst in instances:
 		
-			res.append (self.get_resource ("wines:" + inst)) # TODO: hardcoded ns!!!
+			res.append (self.get_resource (inst))
 			
 		return res
 	
 	# функция получения конкретного ресурса 
-	#  uri - идентификатор ресурса
+	# uri - идентификатор ресурса
 	def get_resource (self, uri):
 	
 		q = """
 				select ?type
 				where
 				{
-					%s a ?type
+					<%s> a ?type
 				}
 			""" % uri
-			
+		
 		type_name = self.convert (self.get_query (q), [("type", ["type"])])["type"][0]
-		
-		t = self.get_class ("wines:" + str(type_name))
-		
-		# запрашиваем свойства ресурса из онтологии
-		q = """
-				select *
-				where
-				{
-					%s ?p ?o .
-					FILTER (?p != rdf:type)
-				}
-			""" % uri
+				
+		t = self.get_class (type_name)
 		
 		r = t()
-		
 		r.uri = uri
-		query = self.convert (self.get_query (q), [("p", "o", )])
 		
 		# добавляем в созданный экземпляр найденные свойства
-		for i in query: r.__dict__[i] = query[i]		
-			
+		
+#		props = self.get_resource_properties (uri)
+#		
+#		for i in props: r.__dict__[i] = props[i]		
+		
 		return r
 	
 	def test (self):
