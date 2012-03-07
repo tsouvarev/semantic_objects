@@ -103,7 +103,7 @@ class SemanticManager (Manager):
 # описываем модель, по которой будем получать данные из онтологии
 class Chianti (Model):
 
-	uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Winery"#"Zinfandel" # вызывает фейл: "DryRedWine"
+	uri = "http://www.w3.org/2002/07/owl#Class"#"http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Winery"#"Zinfandel" # вызывает фейл: "DryRedWine"
 	namespace = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#" #"http://www.w3.org/2002/07/owl#"#
 	ns = "wines"
 	objects = SemanticManager(namespace, ns, uri)

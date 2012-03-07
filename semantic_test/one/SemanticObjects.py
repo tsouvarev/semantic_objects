@@ -325,12 +325,6 @@ class SemanticObjects ():
 		
 		return r
 	
-	def test (self):
-	
-		self.add_namespace ("wines", "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
-		
-		r = self.get_resources ("wines:Chianti")
-		for rr in r: print rr.uri
 			
 
 						
