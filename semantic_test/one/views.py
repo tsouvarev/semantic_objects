@@ -28,7 +28,8 @@ def test(req):
 
 		x = obj
 	
-		html += "%s<br>" % (escape (x.uri))
+		html += "%s<br>" % (escape (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasMaker"]))
+		html += "%s<br>" % (x.uri)
 		html += "%s<br>" % (escape (type(x)))
 		html += "%s<br><br>" % (escape (x.__class__.__mro__))
 	

@@ -14,9 +14,7 @@ class SemanticQuerySet (QuerySet):
 		super(SemanticQuerySet, self).__init__(model)
 		
 		self.s = SemanticObjects ("http://fourstore.avalon.ru/sparql/")
-		#self.s.add_namespace (ns, namespace)
 		#self.s.add_namespace ("wines", "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
-		#self.ns = ns
 		self.uri = uri
 		
 		# получаем все экземпляры класса
@@ -91,9 +89,6 @@ class SemanticManager (Manager):
 	def __init__(self, uri):
 
 		super(SemanticManager, self).__init__()
-		
-#		self.namespace = namespace
-#		self.ns = ns
 		self.uri = uri	
 		
 	def get_query_set (self):
@@ -101,23 +96,24 @@ class SemanticManager (Manager):
 		return SemanticQuerySet (self.model, self.uri)
 	
 # описываем модель, по которой будем получать данные из онтологии
-class Factory ():
+class Factory (object):
 
 #	uri = "http://www.w3.org/2002/07/owl#Class"
 #	uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay"#"Zinfandel" # вызывает фейл: "DryRedWine"
 #	namespace = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#" #"http://www.w3.org/2002/07/owl#"#
 #	ns = "wines"
 	
-	def __new__ (self):
+	def __new__ (cls, uri):
 	
 		t = uri.rsplit ("#")
 		name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
 	
-		return type (name, (), {})
+		return type (name, (object,), {"uri": uri, "objects": SemanticManager (uri)})
 	
 	def __init__ (self, uri):
-	
-		self.objects = SemanticManager (uri)
+
+		pass
+#		self.objects = SemanticManager (uri)
 	
 	
 	
