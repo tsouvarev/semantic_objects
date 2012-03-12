@@ -1,0 +1,20 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.3.6)  7 MAR 2012 14:44
+entering extended mode
+ %&-line parsing enabled.
+**/home/minime/Desktop/Discrete_math/dicrete_math.tex
+
+! Emergency stop.
+<*> ...nime/Desktop/Discrete_math/dicrete_math.tex
+                                                  
+End of file on the terminal!
+
+ 
+Here is how much of TeX's memory you used:
+ 144 strings out of 494818
+ 1459 string characters out of 1178667
+ 47783 words of memory out of 3000000
+ 3289 multiletter control sequences out of 15000+50000
+ 3640 words of font info for 14 fonts, out of 3000000 for 9000
+ 212 hyphenation exceptions out of 8191
+ 0i,0n,0p,231b,6s stack positions out of 5000i,500n,10000p,200000b,50000s
+!  ==> Fatal error occurred, no output PDF file produced!

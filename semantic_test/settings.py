@@ -86,11 +86,11 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
+#    'django.contrib.auth',
+#    'django.contrib.contenttypes',
+#    'django.contrib.sessions',
+#    'django.contrib.sites',
+#    'django.contrib.messages',
     'one',
     'test_usual_db',
     # Uncomment the next line to enable the admin:

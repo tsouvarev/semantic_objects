@@ -38,9 +38,7 @@ class SemanticQuerySet (QuerySet):
 		return len (self.resources)
 		
 	def filter (self, **kwargs):
-	
-		print kwargs
-	
+		
 		res = list (self.resources)
 		
 		for attr in kwargs:
@@ -49,9 +47,9 @@ class SemanticQuerySet (QuerySet):
 			
 			for obj in res:
 				
-				if hasattr (obj, attr) and obj[attr] == kwargs[attr]: tmp.append (obj)
+				if hasattr (obj, attr) and obj[attr] == kwargs[attr]: tmp.append (obj)				
 				
-			res = tmp			
+			res = list(tmp)
 	
 		return res
 	
@@ -59,7 +57,7 @@ class SemanticQuerySet (QuerySet):
 	
 		t = self.filter (**kwargs)
 		
-		print "t: " % t
+#		print "t: " % t
 	
 		return t[0] if len(t)>0 else []
 #		

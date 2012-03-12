@@ -1,0 +1,81 @@
+<rdf:RDF 
+		xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+		xmlns:s="http://www.w3.org/2000/01/rdf-schema#"
+		xmlns:xlink="http://www.w3.org/1999/xlink">
+<s:Class rdf:ID="Resource">
+	<s:comment>RDF Schema for RDDL: 2001-01-29</s:comment>
+	<s:subClassOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag"/>
+	<s:subClassOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement"/>
+</s:Class>
+<s:Class rdf:ID="Namespace">
+	<s:subClassOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag"/>
+</s:Class>
+<rdf:Property rdf:ID="resource">
+	<s:domain rdf:resource="#Resource"/>
+	<s:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+</rdf:Property>
+<rdf:Property rdf:ID="id">
+	<s:domain rdf:resource="#resource"/>
+	<s:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+</rdf:Property>
+<rdf:Property rdf:about="http://www.w3.org/1999/xlink#arcrole">
+	<s:comment>xlink:arcrole is a property of the rddl:resource Class</s:comment>
+	<s:label>arcrole</s:label>
+	<s:domain rdf:resource="#resource"/>
+	<s:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+	<s:subPropertyOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate"/>
+</rdf:Property>
+<rdf:Property rdf:about="http://www.w3.org/1999/xlink#role">
+	<s:comment>xlink:role is a property of the rddl:resource Class</s:comment>
+	<s:label>role</s:label>
+	<s:domain rdf:resource="#resource"/>
+	<s:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+	<rdf:value rdf:resource="http://www.rddl/#resource"/>
+</rdf:Property>
+<rdf:Property rdf:ID="purpose">
+	<s:comment>Purpose is derived from xlink:arcrole</s:comment>
+	<s:subPropertyOf rdf:resource="http://www.w3.org/1999/xlink#arcrole"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.w3.org/1999/xlink#href">
+	<s:comment>xlink:href is a property of the rddl:resource Class</s:comment>
+	<s:label>href</s:label>
+	<s:domain rdf:resource="#resource"/>
+	<s:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+	<s:subPropertyOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#object"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.w3.org/1999/xlink#title">
+	<s:comment>xlink:title is a property of the rddl:resource Class</s:comment>
+	<s:label>title</s:label>
+	<s:domain rdf:resource="#resource"/>
+	<s:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+</rdf:Property>
+<rdf:Property rdf:about="http://www.w3.org/1999/xlink#type">
+	<s:comment>xlink:type defaults to 'simple' is a property of the rddl:resource Class</s:comment>
+	<s:label>type</s:label>
+	<s:domain rdf:resource="#resource"/>
+	<s:range rdf:resource="http://www.w3.org/1999/xlink#type"/>
+	<rdf:value>simple</rdf:value>
+</rdf:Property>
+<rdf:Alt rdf:about="http://www.w3.org/1999/xlink#type">
+	<rdf:li>simple</rdf:li>
+	<rdf:li>extended</rdf:li>
+	<rdf:li>locator</rdf:li>
+	<rdf:li>resource</rdf:li>
+	<rdf:li>arc</rdf:li>
+</rdf:Alt>
+<rdf:Property rdf:about="http://www.w3.org/XML/1998/namespace#base">
+	<s:comment>xml:base is a property of the rddl:resource Class</s:comment>
+	<s:label>xml:base</s:label>
+	<s:domain rdf:resource="#resource"/>
+	<s:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+</rdf:Property>
+<rdf:Property rdf:about="http://www.w3.org/XML/1998/namespace#lang">
+	<s:comment>xml:lang is a property of the rddl:resource Class</s:comment>
+	<s:label>xml:lang</s:label>
+	<s:domain rdf:resource="#resource"/>
+	<s:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+</rdf:Property>
+
+</rdf:RDF>

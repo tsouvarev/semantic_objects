@@ -2,7 +2,33 @@
 # -*- coding: utf-8 -*-
 
 import SPARQLWrapper as wrap
-from SPARQLWrapper import SPARQLWrapper, JSON
+from DBBackends import FourStoreBackend
+
+class Thing (object):
+
+	def __repr__ (self): 
+	
+		return u"" + self.uri
+		
+ 	def __str__ (self):
+ 	
+ 		return u"" + self.uri
+ 	
+ 	def __unicode__ (self):
+ 	
+ 		return u"" + self.uri
+
+	def __getattr__ (self, key):		
+		
+		print "demanded: ", key
+		return self.get_property (s.uri, key)
+		
+	def __setattr__ (self, key, val):
+	
+		self.__dict__[key] = val
+ 			
+	__getitem__ = __getattr__
+	__setitem__ = __setattr__
 
 # Класс, отображающий RDF-тройки в объекты Python
 class SemanticObjects ():
@@ -10,7 +36,8 @@ class SemanticObjects ():
 	def __init__ (self, addr):
 
 		# запоминаем SPARQL-endpoint
-		self.sparql = SPARQLWrapper(addr)
+		#self.sparql = SPARQLWrapper(addr)
+		self.db = FourStoreBackend (addr)
 		
 		# строка, содержащая в итоге все нужные запросам 
 		# префиксы для более короткого написания URI ресурсов
@@ -34,16 +61,9 @@ class SemanticObjects ():
 		# формируем сразу шапку запросов из префиксов
 		for ns in self.ns: self.prefixes += "PREFIX %s: <%s>\n" % (ns, self.ns[ns])
 
-	# выполняет запрос, возвращает результат в виде почти прямого 
-	# переноса XML/RDF на списки и объекты в Python
 	def get_query (self, query):
-
-		self.sparql.setQuery(self.prefixes + query)
-
-		self.sparql.setReturnFormat(JSON)
-		results = self.sparql.query().convert()
-
-		return results
+	
+		return self.db.query (self.prefixes + query)
 
 	# красивая печать результатов
 	def print_results (self, results):
@@ -63,7 +83,7 @@ class SemanticObjects ():
 		# сразу обновляем шапку запросов
 		self.prefixes += "PREFIX %s: <%s>\n" % (name, namespace)
 
-	# конвертация результатов от get_query в более удобный вид
+	# конвертация результатов от get_query в более удобный вид (description is obsoleted)
 	# properties - результаты от get_query
 	# schema - схема преобразования
 	#
@@ -81,7 +101,7 @@ class SemanticObjects ():
 	# записать его в итоговый объект как атрибут "a"
 	# кортеж ("a", ["b","c"]) означает взять из properties все свойства под названиями "b" и "c" и
 	# записать их в один список под названием "a"
-	def convert (self, properties, schemas, split = False):
+	def convert (self, properties, schemas, split = False, create = False):
 
 		c = {}
 		
@@ -96,11 +116,15 @@ class SemanticObjects ():
 					p = prop[i]
 
 					if p["type"] != "bnode":
-
+						
+						print "to create (single): ", p
+						
+#						if p["type"] == "uri": p = self.get_resource (p["value"])
+#						else: p = p["value"]
 						p = p["value"]
 				
-						if split: p = p.rsplit ("#")[1]
-					
+						print "created (single): ", type (p), p
+									
 						c[i] = p
 		
 			else:
@@ -119,12 +143,15 @@ class SemanticObjects ():
 						if p["type"] != "bnode" and v["type"] != "bnode":
 
 							p = p["value"]
+							
+							print "to create (str): ", v
+							
+#							if v["type"] == "uri": v = self.get_resource (v["value"])
+#							else: v = v["value"]
 							v = v["value"]
 					
-							if split:
-								p = p.rsplit ("#")[1]
-								v = v.rsplit ("#")[1]
-						
+							print "created (str): ", type (v), v
+					
 							c[p] = v
 
 				elif type(val) == list:
@@ -136,13 +163,19 @@ class SemanticObjects ():
 						for n in val:
 
 							if p[n]["type"] != "bnode": 
-					
+								
+								print "to create (list): ", p[n]
+								
+#								if p[n]["type"] == "uri": v = self.get_resource (p[n]["value"])
+#								else: v = p[n]["value"]
 								v = p[n]["value"]
 					
-								if split: v = v.rsplit("#")[1]
-						
+								print "created (list): ", type (v), v
+					
 								c[name].append (v)
 
+		print "done!"
+		
 		return c
 
 	def get_class_properties (self, uri):
@@ -179,6 +212,8 @@ class SemanticObjects ():
 				}
 				""" % ((uri,)*4)
 		
+		print "q in get_class_property"
+		
 		# добавляем найденные свойства в словарь, понадобится при создании класса
 		props = self.convert (self.get_query (q), [("prop", "val",)])
 		
@@ -195,7 +230,9 @@ class SemanticObjects ():
 					FILTER (?prop != rdf:type)
 				}
 			""" % uri
-				
+		
+		print "q in get_resource_property"
+		
 		props = self.convert (self.get_query (q), [("prop", "val", )])
 		
 		return props
@@ -203,50 +240,17 @@ class SemanticObjects ():
 	# если несколько разных значений одного атрибута, то возьмется последнее
 	def get_property (self, uri, name):
 	
-		val = self.__get_property (uri, name)
-		if val is not None: return val
-			
-		if uri in self.classes:
-		
-			print "mro: ", self.classes[uri].__mro__
-		
-			for cls in self.classes[uri].__mro__:
-			
-				print cls.__name__
-			
-				if hasattr (cls, name): return getattr(cls, name)
-				
-				elif hasattr (cls, "uri"): 
-				
-					t = self.__get_property (cls.uri, name)  
-					
-					if t is not None: return t
-		
-		return None
-		
+		print "get: ", uri, name
 	
+		obj = self.classes[uri]
+	
+		if name not in obj.__dict__: raise AttributeError ("Key '" + name + "' not in '" + uri + "'")
+		else: return obj.__dict__[name]
+		
 	def __get_property (self, uri, name):
 	
-		if hasattr (self.classes[uri], name): return getattr (self.classes[uri], name)
-		
 		c = {}
-				
-			#print "in: %s" % ([self.classes[uri]] +self.superclasses[self.classes[uri].uri])
-			
-#			if uri not in self.superclasses:
-
-#				if name not in dir(self.classes[uri]): val = self.get_property (self.classes[uri].uri, name)
-#				else: val = self.classes[uri].__getattribute__ (name)
-#			
-#				for b in self.superclasses[self.classes[uri].uri]: # properties for resource
-#				
-#					print b
-#				
-#					if name not in dir(b): val = self.get_property (b.uri, name)
-#					else: val = b.__getattribute__ (name)
-#				
-#					if val is not None: return val
-	
+		
 		q = """
 				select ?val
 				where 
@@ -285,12 +289,16 @@ class SemanticObjects ():
 		
 		# добавляем найденные свойства в словарь, понадобится при создании класса
 		
-		print self.get_query (q)
+		print "q in get_property"
 		
-		val = self.convert (self.get_query (q), [("val",)])	
+		val = self.convert (self.get_query (q), [("val",)])
 		
-		print "type: ", type(self.classes[uri])
-		if "val" in val: setattr (self.classes[uri], name, val)
+		print "val: ", val
+		print "type: ", self.classes[uri]
+		if "val" in val: 
+		
+			setattr (self.classes[uri], name, val)
+			return val["val"]
 		
 		return val
 
@@ -336,55 +344,59 @@ class SemanticObjects ():
 					}
 				}""" % ((uri,)*5)
 		
+		print "q in get_superclasses"
+		
+		a = self.convert (self.get_query (q), [("classes", ["class"], )])["classes"]
+		print "met: ", a
+		
 		# сразу заполняем кэш классов, если класс еще не встречался
-		# TODO: если кэш не сбрасывается между запросами, 
-		# то почему в иерархии наследования для конкретного класса нет лишних классов?
-		for i in self.convert (self.get_query (q), [("classes", ["class"], )])["classes"]: 
+		for i in a: 
+			
+			print "getting ", i
 			
 			if i not in self.classes: 
+			
 				self.classes[i] = self.get_class (i)
 		
 			bases.append (self.classes[i])
-		
-		#self.superclasses[uri] = bases
-#		print "b: %s" % bases
 		
 		return bases
 
 	# функция создания классов по URI
 	def get_class (self, uri):
 
+		print "cache: ", self.classes
+
 		if uri in self.classes: return self.classes[uri]
 		
-		# выделяем название класса из URI
-		# может быть в виде smth#name или smth:name
-		# первое есть традиционная форма записи, вторая принята в SPARQL-запросах
+		print "uri in gc: ", type (uri)
+		
 		t = uri.rsplit ("#")
 		name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
 		
 		props = {} #self.get_class_properties (uri)
-		bases = self.get_class_superclasses (uri)
+		bases = [object] #self.get_class_superclasses (uri)
 		
 		# создаем новый тип, который потом и вернем
 		r = type (str(name), tuple (bases), props)
 		r.uri = uri
-	
- 		r.__repr__ = lambda self: u"" + self.uri
- 		r.__str__ = lambda self: u"" + self.uri
- 		
- 		def get_attr (s, key):		
-			
+		
+		r.__repr__ = lambda self: u"" + self.uri
+		r.__str__ = lambda self: u"" + self.uri
+
+		def get_attr (s, key):
+
 			return self.get_property (s.uri, key)
- 			
- 		def set_attr (s, key, val):
- 		
- 			s.__dict__[key] = val
- 			
- 		r.__getitem__ = get_attr
- 		r.__getattr__ = get_attr
- 		r.__setitem__ = set_attr
-# 		r.__getattribute__ = get
- 		
+
+		def set_attr (s, key, val):
+
+			s.__dict__[key] = val
+
+		r.__getitem__ = get_attr
+		r.__getattr__ = get_attr
+		r.__setitem__ = set_attr
+		# r.__getattribute__ = get
+	
  		self.classes[uri] = r
  		
 		return r
@@ -404,12 +416,18 @@ class SemanticObjects ():
 			""" % class_uri
 		
 		# список названий всех экземпляров из онтологии
+		
+		print "q in get_resources"
+		
 		instances = self.convert (self.get_query (q), [("inst", ["inst"], )])["inst"]
 		
 		res = []
 		
-		for inst in instances:
+		print "instances: ", instances
 		
+		for inst in instances:
+			
+			print "inst type: ", type (inst)
 			res.append (self.get_resource (inst, class_uri))
 			
 		return res
@@ -418,6 +436,16 @@ class SemanticObjects ():
 	# uri - идентификатор ресурса
 	def get_resource (self, uri, type_name = None):
 	
+		print "resource: ", uri
+		print "type in get_resource: ", type (type_name)
+	
+		t = None
+		
+		if uri == "http://www.w3.org/2002/07/owl#Class": 
+		
+			print "-1"
+			return None
+			
 		if type_name is None:
 	
 			q = """
@@ -428,14 +456,26 @@ class SemanticObjects ():
 					}
 				""" % uri
 		
-			type_name = self.convert (self.get_query (q), [("type", ["type"])])["type"][0]
-				
-		t = self.get_class (type_name)
-				
-		self.classes[uri] = t
+			print "q in get_resource", uri, self.get_query (q)
+		
+			t = self.convert (self.get_query (q), [("type",)])
+		
+			print "!!type: ", t
+#			print
+		
+		else:
+		
+			print "!!!!!!! ", type (type_name)
+			t = self.get_class (type_name)
+		
+		print "??type: ", t
 		
 		r = t()
 		r.uri = uri
+		
+		self.classes[uri] = r
+		
+		print "mem: ", uri, r
 		
 		# добавляем в созданный экземпляр найденные свойства
 		
