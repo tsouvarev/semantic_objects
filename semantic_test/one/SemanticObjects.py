@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import SPARQLWrapper as wrap
-from DBBackends import FourStoreBackend
+from DBBackends import SparqlBackend
 
 class Thing (object):
 
@@ -37,7 +37,7 @@ class SemanticObjects ():
 
 		# запоминаем SPARQL-endpoint
 		#self.sparql = SPARQLWrapper(addr)
-		self.db = FourStoreBackend (addr)
+		self.db = SparqlBackend (addr)
 		
 		# строка, содержащая в итоге все нужные запросам 
 		# префиксы для более короткого написания URI ресурсов

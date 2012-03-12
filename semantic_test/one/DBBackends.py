@@ -9,21 +9,21 @@ class Backend (object):
 	
 		pass
 
-class FourStoreBackend (Backend):
+class SparqlBackend (Backend):
 
 	def __init__ (self, address):
 	
 		self.address = address
 		
-		self.sparql = SPARQLWrapper(address)
+		self.endpoint = SPARQLWrapper(address)
 		
 	# выполняет запрос, возвращает результат в виде почти прямого 
 	# переноса XML/RDF на списки и объекты в Python
 	def query (self, query):
 
-		self.sparql.setQuery(query)
+		self.endpoint.setQuery(query)
 
-		self.sparql.setReturnFormat(JSON)
-		results = self.sparql.query().convert()
+		self.endpoint.setReturnFormat(JSON)
+		results = self.endpoint.query().convert()
 
 		return results
