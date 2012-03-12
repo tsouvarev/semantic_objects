@@ -17,7 +17,7 @@ def test(req):
 #	print dir (Book.objects.all())
 #	
 #	
-	Chardonnay = Factory ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#PinotNoir")
+	Chardonnay = Factory ("http://www.w3.org/2002/07/owl#Class")
 	t = Chardonnay.objects.all ()
 	html = ""
 #	html = "m: %s<br><br>" % escape (type (Chardonnay.objects))
@@ -31,8 +31,8 @@ def test(req):
 		x = obj
 	
 		#html += "%s<br>" % (escape (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn"]))
-		html += "%s:<br>" % (x.uri)
-		html += "%s<br><br>" % (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor"])
+		html += "%s<br>" % (x.uri)
+#		html += "%s<br><br>" % (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor"])
 
 #		html += "%s<br><br>" % (escape (x.__class__.__mro__))
 #	

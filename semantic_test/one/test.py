@@ -3,5 +3,5 @@
 
 from SemanticObjects import *
 
-s = SemanticObjects ("http://fourstore.avalon.ru/sparql/")
+s = SemanticObjects ("fourstore.avalon.ru")
 s.test ()

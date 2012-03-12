@@ -13,7 +13,7 @@ class SemanticQuerySet (QuerySet):
 		
 		super(SemanticQuerySet, self).__init__(model)
 		
-		self.s = SemanticObjects ("http://fourstore.avalon.ru/sparql/")
+		self.s = SemanticObjects ("http://fourstore.avalon.ru:80")
 		#self.s.add_namespace ("wines", "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
 		self.uri = uri
 		

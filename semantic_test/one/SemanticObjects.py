@@ -20,7 +20,6 @@ class Thing (object):
 
 	def __getattr__ (self, key):		
 		
-		print "demanded: ", key
 		return self.get_property (s.uri, key)
 		
 	def __setattr__ (self, key, val):
@@ -30,7 +29,7 @@ class Thing (object):
 	__getitem__ = __getattr__
 	__setitem__ = __setattr__
 
-# Класс, отображающий RDF-тройки в объекты Python
+# Класс, отображающий RDF-триплеты в объекты Python
 class SemanticObjects ():
 
 	def __init__ (self, addr):
@@ -117,14 +116,10 @@ class SemanticObjects ():
 
 					if p["type"] != "bnode":
 						
-						print "to create (single): ", p
-						
 #						if p["type"] == "uri": p = self.get_resource (p["value"])
 #						else: p = p["value"]
 						p = p["value"]
-				
-						print "created (single): ", type (p), p
-									
+					
 						c[i] = p
 		
 			else:
@@ -144,13 +139,9 @@ class SemanticObjects ():
 
 							p = p["value"]
 							
-							print "to create (str): ", v
-							
 #							if v["type"] == "uri": v = self.get_resource (v["value"])
 #							else: v = v["value"]
 							v = v["value"]
-					
-							print "created (str): ", type (v), v
 					
 							c[p] = v
 
@@ -164,18 +155,12 @@ class SemanticObjects ():
 
 							if p[n]["type"] != "bnode": 
 								
-								print "to create (list): ", p[n]
-								
 #								if p[n]["type"] == "uri": v = self.get_resource (p[n]["value"])
 #								else: v = p[n]["value"]
 								v = p[n]["value"]
 					
-								print "created (list): ", type (v), v
-					
 								c[name].append (v)
 
-		print "done!"
-		
 		return c
 
 	def get_class_properties (self, uri):
@@ -242,8 +227,6 @@ class SemanticObjects ():
 	
 		obj = self.classes[uri]
 		
-		print "getting: ", uri, name
-	
 		if name not in obj.__dict__: 
 			
 			t = self.__get_property (obj.uri, name)
@@ -266,8 +249,6 @@ class SemanticObjects ():
 			
 		raise AttributeError ("Key '" + name + "' not in '" + uri + "'")
 	
-
-		
 	def __get_property (self, uri, name):
 	
 		c = {}
@@ -314,10 +295,10 @@ class SemanticObjects ():
 		
 		if "val" in val: 
 		
-			setattr (self.classes[uri], name, val)
+			setattr (self.classes[uri], name, val["val"])
 			return val["val"]
 		
-		return val
+		return None
 
 	def get_class_superclasses (self, uri):
 	
@@ -377,11 +358,7 @@ class SemanticObjects ():
 	# функция создания классов по URI
 	def get_class (self, uri):
 
-		print "cache: ", self.classes
-
 		if uri in self.classes: return self.classes[uri]
-		
-		print "uri in gc: ", type (uri)
 		
 		t = uri.rsplit ("#")
 		name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
@@ -429,17 +406,12 @@ class SemanticObjects ():
 		
 		# список названий всех экземпляров из онтологии
 		
-		print "q in get_resources"
-		
 		instances = self.convert (self.get_query (q), [("inst", ["inst"], )])["inst"]
 		
 		res = []
 		
-		print "instances: ", instances
-		
 		for inst in instances:
 			
-			print "inst type: ", type (inst)
 			res.append (self.get_resource (inst, class_uri))
 			
 		return res
@@ -448,16 +420,8 @@ class SemanticObjects ():
 	# uri - идентификатор ресурса
 	def get_resource (self, uri, type_name = None):
 	
-		print "resource: ", uri
-		print "type in get_resource: ", type (type_name)
-	
 		t = None
 		
-		if uri == "http://www.w3.org/2002/07/owl#Class": 
-		
-			print "-1"
-			return None
-			
 		if type_name is None:
 	
 			q = """
@@ -468,26 +432,16 @@ class SemanticObjects ():
 					}
 				""" % uri
 		
-			print "q in get_resource", uri, self.get_query (q)
-		
 			t = self.convert (self.get_query (q), [("type",)])
-		
-			print "!!type: ", t
-#			print
 		
 		else:
 		
-			print "!!!!!!! ", type (type_name)
 			t = self.get_class (type_name)
-		
-		print "??type: ", t
 		
 		r = t()
 		r.uri = uri
 		
 		self.classes[uri] = r
-		
-		print "mem: ", uri, r
 		
 		# добавляем в созданный экземпляр найденные свойства
 		
@@ -497,9 +451,21 @@ class SemanticObjects ():
 		
 		return r
 	
-			
+	def insert (self, query):
+	
+		print self.db.insert (query)
+		
+	def delete (self, query):
+	
+		print self.db.delete (query)
 
-						
+	def test (self):
+	
+#		self.insert ("insert {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
+	
+		self.delete ("delete where {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
+	
+		pass
 			
 			
 			
