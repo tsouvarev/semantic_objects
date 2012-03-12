@@ -57,9 +57,9 @@ class SemanticQuerySet (QuerySet):
 	
 		t = self.filter (**kwargs)
 		
-#		print "t: " % t
-	
-		return t[0] if len(t)>0 else []
+		if type(t) == list: raise Exception ("Too many records retrieved for ", kwargs)
+		
+		return t
 #		
 #	def exclude (self, **kwargs):
 #	

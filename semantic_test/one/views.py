@@ -17,11 +17,11 @@ def test(req):
 #	print dir (Book.objects.all())
 #	
 #	
-	Chardonnay = Factory ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Region")
+	Chardonnay = Factory ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#PinotNoir")
 	t = Chardonnay.objects.all ()
 	html = ""
 #	html = "m: %s<br><br>" % escape (type (Chardonnay.objects))
-	html = "get: %s<br><br>" % escape (t.get(uri="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#FrenchRegion"))
+#	html = "get: %s<br><br>" %  (t.filter(uri="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#BancroftChardonnay"))
 #	html = "dir: %s<br><br>" % escape (dir (Chardonnay.objects))
 #	html += "len: %s<br><br>" % len (t)
 
@@ -31,8 +31,9 @@ def test(req):
 		x = obj
 	
 		#html += "%s<br>" % (escape (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn"]))
-		html += "%s<br>" % (x.uri)
-#		html += "%s<br>" % (escape (type(x)))
+		html += "%s:<br>" % (x.uri)
+		html += "%s<br><br>" % (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor"])
+
 #		html += "%s<br><br>" % (escape (x.__class__.__mro__))
 #	
 #		for p in x.__dict__:

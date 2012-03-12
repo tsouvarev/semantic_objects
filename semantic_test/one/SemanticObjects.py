@@ -240,12 +240,33 @@ class SemanticObjects ():
 	# если несколько разных значений одного атрибута, то возьмется последнее
 	def get_property (self, uri, name):
 	
-		print "get: ", uri, name
-	
 		obj = self.classes[uri]
+		
+		print "getting: ", uri, name
 	
-		if name not in obj.__dict__: raise AttributeError ("Key '" + name + "' not in '" + uri + "'")
-		else: return obj.__dict__[name]
+		if name not in obj.__dict__: 
+			
+			t = self.__get_property (obj.uri, name)
+			if t is not None: return t
+		
+		else: return obj.__dict__[name]		
+		
+		for base in obj.__class__.__mro__:
+			
+			print base
+			
+			if hasattr (base, name):
+			
+				return getattr (base, name)
+			
+			else:
+			
+				t = self.__get_property (base.uri, name)
+				if t is not None: return t
+			
+		raise AttributeError ("Key '" + name + "' not in '" + uri + "'")
+	
+
 		
 	def __get_property (self, uri, name):
 	
@@ -289,12 +310,8 @@ class SemanticObjects ():
 		
 		# добавляем найденные свойства в словарь, понадобится при создании класса
 		
-		print "q in get_property"
-		
 		val = self.convert (self.get_query (q), [("val",)])
 		
-		print "val: ", val
-		print "type: ", self.classes[uri]
 		if "val" in val: 
 		
 			setattr (self.classes[uri], name, val)
@@ -344,15 +361,10 @@ class SemanticObjects ():
 					}
 				}""" % ((uri,)*5)
 		
-		print "q in get_superclasses"
-		
 		a = self.convert (self.get_query (q), [("classes", ["class"], )])["classes"]
-		print "met: ", a
 		
 		# сразу заполняем кэш классов, если класс еще не встречался
 		for i in a: 
-			
-			print "getting ", i
 			
 			if i not in self.classes: 
 			
@@ -375,7 +387,7 @@ class SemanticObjects ():
 		name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
 		
 		props = {} #self.get_class_properties (uri)
-		bases = [object] #self.get_class_superclasses (uri)
+		bases = self.get_class_superclasses (uri)
 		
 		# создаем новый тип, который потом и вернем
 		r = type (str(name), tuple (bases), props)
