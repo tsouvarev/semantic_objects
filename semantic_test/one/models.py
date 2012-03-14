@@ -31,7 +31,7 @@ class SemanticQuerySet (QuerySet):
 	def __getitem__ (self, k):
 	
 		if -1 < k < len (self.resources): return self.resources[k]
-		else: return None
+		else: raise Exception ("Object doesn't have item with key '" + str(key)+"'")
 		
 	def __len__ (self):
 	
@@ -60,6 +60,10 @@ class SemanticQuerySet (QuerySet):
 		if type(t) == list: raise Exception ("Too many records retrieved for ", kwargs)
 		
 		return t
+	
+	def get_properties (self):
+	
+		
 #		
 #	def exclude (self, **kwargs):
 #	

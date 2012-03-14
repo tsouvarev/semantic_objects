@@ -8,15 +8,15 @@ class Thing (object):
 
 	def __repr__ (self): 
 	
-		return u"" + self.uri
-		
- 	def __str__ (self):
+		return self.uri
+
+	def __str__ (self):
  	
- 		return u"" + self.uri
+ 		return self.uri
  	
- 	def __unicode__ (self):
+	def __unicode__ (self):
  	
- 		return u"" + self.uri
+		return self.uri
 
 	def __getattr__ (self, key):		
 		
@@ -158,7 +158,7 @@ class SemanticObjects ():
 #								if p[n]["type"] == "uri": v = self.get_resource (p[n]["value"])
 #								else: v = p[n]["value"]
 								v = p[n]["value"]
-					
+				
 								c[name].append (v)
 
 		return c
@@ -197,8 +197,6 @@ class SemanticObjects ():
 				}
 				""" % ((uri,)*4)
 		
-		print "q in get_class_property"
-		
 		# добавляем найденные свойства в словарь, понадобится при создании класса
 		props = self.convert (self.get_query (q), [("prop", "val",)])
 		
@@ -216,11 +214,46 @@ class SemanticObjects ():
 				}
 			""" % uri
 		
-		print "q in get_resource_property"
-		
 		props = self.convert (self.get_query (q), [("prop", "val", )])
 		
 		return props
+	
+	def get_properties (self, class_uri):
+	
+		q_all = "select distinct ?prop where { ?prop rdf:type owl:ObjectProperty . }"
+		q_inverse = "select distinct ?prop where { ?prop rdf:type owl:ObjectProperty ; owl:inverseOf ?p }"
+		q_domain = "select distinct ?prop where { ?prop rdf:type owl:ObjectProperty ; rdfs:domain ?d }"
+		
+		s_all = set (self.convert (self.get_query (q_all), [("props", ["prop"],)])["props"])
+		s_inverse = set (self.convert (self.get_query (q_inverse), [("props", ["prop"],)])["props"])
+		s_domain = set (self.convert (self.get_query (q_domain), [("props", ["prop"],)])["props"])
+		
+		print s_all - s_domain - s_inverse
+		
+		obj = self.classes[class_uri]
+		
+		q = "select distinct ?prop where {"
+		
+		for cls in obj.__mro__:
+		
+			if hasattr (cls, "uri"):
+		
+				q += """
+					{
+					?prop rdf:type owl:ObjectProperty .
+					?prop rdfs:domain <%s>
+					}
+					union
+					""" % cls.uri
+
+		q = q[:-16] + "}"
+		print "q properties: ", q
+		
+		props = self.convert (self.get_query (q), [("props", ["prop"],)])["props"] + \
+				list (s_all-s_domain-s_inverse)
+		
+		return props
+		
 	
 	# если несколько разных значений одного атрибута, то возьмется последнее
 	def get_property (self, uri, name):
@@ -463,7 +496,11 @@ class SemanticObjects ():
 	
 #		self.insert ("insert {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
 	
-		self.delete ("delete where {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
+		#self.delete ("delete where {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
+		
+		self.get_class ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
+		
+		print self.get_properties ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
 	
 		pass
 			

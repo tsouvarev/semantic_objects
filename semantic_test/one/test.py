@@ -3,5 +3,5 @@
 
 from SemanticObjects import *
 
-s = SemanticObjects ("fourstore.avalon.ru")
+s = SemanticObjects ("http://fourstore.avalon.ru:80")
 s.test ()
