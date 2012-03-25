@@ -24,15 +24,22 @@ def test(req):
 #	html = "get: %s<br><br>" %  (t.filter(uri="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#BancroftChardonnay"))
 #	html = "dir: %s<br><br>" % escape (dir (Chardonnay.objects))
 #	html += "len: %s<br><br>" % len (t)
-	html += "%s<br>" % (t.available_properties)
+	
 #	if type (t) is list:
-	for obj in t:
+	obj = t[0]
+	
+	html += "%s<br><br>%s<br><br>" % (obj.available_properties, obj.uri)
+	
+	for prop in obj.available_properties:
 
 		x = obj
 	
 		#html += "%s<br>" % (escape (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn"]))
-		html += "%s<br>" % (x.uri)
-		html += "%s<br>" % (x.available_properties)
+		try:
+			html += "%s: %s<br>" % (prop, getattr (x, prop))
+		except: 
+			html += "%s: %s<br>" % (prop, None)
+#		html += "%s<br>" % (x.available_properties)
 		
 #		html += "%s<br><br>" % (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor"])
 

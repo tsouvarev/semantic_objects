@@ -414,7 +414,7 @@ class SemanticObjects ():
 			s.__dict__[key] = val
 
 		r.__getitem__ = get_attr
-		#r.__getattr__ = get_attr
+		r.__getattr__ = get_attr
 		r.__setitem__ = set_attr
 		r.available_properties = property (lambda x: self.get_available_properties (r.uri))
 		# r.__getattribute__ = get
