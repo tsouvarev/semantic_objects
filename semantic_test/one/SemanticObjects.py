@@ -218,7 +218,7 @@ class SemanticObjects ():
 		
 		return props
 	
-	def get_properties (self, class_uri):
+	def get_available_properties (self, class_uri):
 	
 		q_all = "select distinct ?prop where { ?prop rdf:type owl:ObjectProperty . }"
 		q_inverse = "select distinct ?prop where { ?prop rdf:type owl:ObjectProperty ; owl:inverseOf ?p }"
@@ -228,10 +228,10 @@ class SemanticObjects ():
 		s_inverse = set (self.convert (self.get_query (q_inverse), [("props", ["prop"],)])["props"])
 		s_domain = set (self.convert (self.get_query (q_domain), [("props", ["prop"],)])["props"])
 		
-		print s_all - s_domain - s_inverse
-		
 		obj = self.classes[class_uri]
 		
+		walk = []
+				
 		q = "select distinct ?prop where {"
 		
 		for cls in obj.__mro__:
@@ -247,7 +247,6 @@ class SemanticObjects ():
 					""" % cls.uri
 
 		q = q[:-16] + "}"
-		print "q properties: ", q
 		
 		props = self.convert (self.get_query (q), [("props", ["prop"],)])["props"] + \
 				list (s_all-s_domain-s_inverse)
@@ -269,7 +268,7 @@ class SemanticObjects ():
 		
 		for base in obj.__class__.__mro__:
 			
-			print base
+			print "base:", base
 			
 			if hasattr (base, name):
 			
@@ -415,8 +414,9 @@ class SemanticObjects ():
 			s.__dict__[key] = val
 
 		r.__getitem__ = get_attr
-		r.__getattr__ = get_attr
+		#r.__getattr__ = get_attr
 		r.__setitem__ = set_attr
+		r.available_properties = property (lambda x: self.get_available_properties (r.uri))
 		# r.__getattribute__ = get
 	
  		self.classes[uri] = r

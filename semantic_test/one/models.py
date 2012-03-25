@@ -57,13 +57,15 @@ class SemanticQuerySet (QuerySet):
 	
 		t = self.filter (**kwargs)
 		
-		if type(t) == list: raise Exception ("Too many records retrieved for ", kwargs)
+		if len (t) > 1: raise Exception ("Too many records retrieved for ", kwargs)
 		
 		return t
 	
-	def get_properties (self):
+	available_properties = property (lambda self: self.s.get_available_properties (self.uri))
 	
-		
+#	def get_properties (self):
+#	
+#		return self.s.get_properties (self.uri)
 #		
 #	def exclude (self, **kwargs):
 #	

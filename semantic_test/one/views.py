@@ -17,14 +17,14 @@ def test(req):
 #	print dir (Book.objects.all())
 #	
 #	
-	Chardonnay = Factory ("http://www.w3.org/2002/07/owl#Class")
+	Chardonnay = Factory ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
 	t = Chardonnay.objects.all ()
 	html = ""
 #	html = "m: %s<br><br>" % escape (type (Chardonnay.objects))
 #	html = "get: %s<br><br>" %  (t.filter(uri="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#BancroftChardonnay"))
 #	html = "dir: %s<br><br>" % escape (dir (Chardonnay.objects))
 #	html += "len: %s<br><br>" % len (t)
-
+	html += "%s<br>" % (t.available_properties)
 #	if type (t) is list:
 	for obj in t:
 
@@ -32,6 +32,8 @@ def test(req):
 	
 		#html += "%s<br>" % (escape (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn"]))
 		html += "%s<br>" % (x.uri)
+		html += "%s<br>" % (x.available_properties)
+		
 #		html += "%s<br><br>" % (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor"])
 
 #		html += "%s<br><br>" % (escape (x.__class__.__mro__))
