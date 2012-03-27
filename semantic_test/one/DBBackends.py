@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from SPARQLWrapper import SPARQLWrapper, JSON
-from urllib import urlencode, urlopen
+from urllib2 import urlopen, HTTPError
+from urllib import urlencode
 from httplib import HTTPConnection
 
 class Backend (object):
@@ -23,19 +24,19 @@ class Backend (object):
 	
 		raise Exception ("Not implemented")
 
-class SparqlBackend (Backend):
+class FourstoreSparqlBackend (Backend):
 
 	def __init__ (self, address):
 	
-		self.address = address
+		self.address = address + "/update/"
 		
 		self.endpoint = SPARQLWrapper(address+"/sparql/")
 		
-		self.conn = HTTPConnection(self.address)
-	
+		#self.conn = urlopen (addr)#HTTPConnection(self.address)
+		
 	def __del__ (self):
 	
-		self.conn.close()
+		pass#self.conn.close()
 	
 	# выполняет запрос, возвращает результат в виде почти прямого 
 	# переноса XML/RDF на списки и объекты в Python
@@ -53,22 +54,27 @@ class SparqlBackend (Backend):
 		values = {"update": q}
 		headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
 		
-		self.conn.request("POST", "/update/", urlencode (values), headers)
-		
-		res = self.conn.getresponse()
-				
-		print res.read()		
+		try: res = urlopen (self.address, urlencode (values))
+		except URLError, e: 
+			
+			print e.reason
+			return False
+		else:
+			return res.read()
+	
 	
 	def delete (self, q):
 	
 		values = {"update": q}
 		headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
 		
-		self.conn.request("POST", "/update/", urlencode (values), headers)
-		
-		res = self.conn.getresponse()
-				
-		print res.read()
+		try: res = urlopen (self.address, urlencode (values))
+		except URLError, e: 
+			
+			print e.reason
+			return False
+		else:
+			return res.read()
 		
 		
 		

@@ -59,7 +59,7 @@ class SemanticQuerySet (QuerySet):
 		
 		if len (t) > 1: raise Exception ("Too many records retrieved for ", kwargs)
 		
-		return t
+		return t[0]
 	
 	available_properties = property (lambda self: self.s.get_available_properties (self.uri))
 	

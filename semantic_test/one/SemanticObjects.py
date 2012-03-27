@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import SPARQLWrapper as wrap
-from DBBackends import SparqlBackend
+from DBBackends import FourstoreSparqlBackend
 
 class Thing (object):
 
@@ -36,7 +36,8 @@ class SemanticObjects ():
 
 		# запоминаем SPARQL-endpoint
 		#self.sparql = SPARQLWrapper(addr)
-		self.db = SparqlBackend (addr)
+		self.db = FourstoreSparqlBackend (addr)
+		print "addr: ", addr
 		
 		# строка, содержащая в итоге все нужные запросам 
 		# префиксы для более короткого написания URI ресурсов
@@ -268,7 +269,7 @@ class SemanticObjects ():
 		
 		for base in obj.__class__.__mro__:
 			
-			print "base:", base
+			#print "base:", base
 			
 			if hasattr (base, name):
 			
@@ -276,8 +277,9 @@ class SemanticObjects ():
 			
 			else:
 			
-				t = self.__get_property (base.uri, name)
-				if t is not None: return t
+				if hasattr (base, "uri"):
+					t = self.__get_property (base.uri, name)
+					if t is not None: return t				
 			
 		raise AttributeError ("Key '" + name + "' not in '" + uri + "'")
 	
@@ -412,10 +414,34 @@ class SemanticObjects ():
 		def set_attr (s, key, val):
 
 			s.__dict__[key] = val
+			print "key '%s' to '%s'" % (key, val)
+			if key not in s.available_properties:
+			
+				base = self.classes[s.uri].__class__
+				print "class name: ", base.uri
+			
+				self.insert (self.prefixes + 
+						"insert {<%s> a owl:ObjectProperty . \
+						<%s> rdfs:domain <%s> . \
+						<%s> <%s> <%s>}" % (key, key, base.uri, s.uri, key, val))
+						# <%s> rdfs:domain <%s> . \ (key, key, base.uri, s.uri, key, val))
+						
+			else: 
+				self.insert (self.prefixes + "insert {<%s> <%s> <%s>}" % (s.uri, key, val))
+
+		def del_attr (s, key):
+		
+			del s.__dict__[key]
+			
+			self.delete (self.prefixes + "delete {<%s> <%s> ?v}" % (s.uri, key))
 
 		r.__getitem__ = get_attr
-		r.__getattr__ = get_attr
+		r.__delitem__ = del_attr
 		r.__setitem__ = set_attr
+		
+		r.__getattr__ = get_attr
+#		r.__setattr__ = set_attr
+		
 		r.available_properties = property (lambda x: self.get_available_properties (r.uri))
 		# r.__getattribute__ = get
 	
@@ -496,11 +522,11 @@ class SemanticObjects ():
 	
 #		self.insert ("insert {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
 	
-		#self.delete ("delete where {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
+#		self.delete ("delete where {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
 		
-		self.get_class ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
-		
-		print self.get_properties ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
+#		self.get_class ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
+#		
+#		print self.get_properties ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
 	
 		pass
 			
