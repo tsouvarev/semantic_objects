@@ -26,7 +26,7 @@ def test(req):
 #	html += "len: %s<br><br>" % len (t)
 	
 #	if type (t) is list:
-	obj = t.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#MountadamChardonnay")
+	obj = t#.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#BancroftChardonnay")
 	
 	html += "<br><br>%s<br><br>" % (obj.available_properties)
 	

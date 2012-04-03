@@ -261,7 +261,7 @@ class SemanticObjects ():
 		s_inverse = set (self.convert (self.get_query (q_inverse), [("props", ["prop"],)])["props"])
 		s_domain = set (self.convert (self.get_query (q_domain), [("props", ["prop"],)])["props"])
 		
-#		print "s_all: ", s_all 
+		print "s_all: ", s_all 
 		
 		obj = self.classes[class_uri]
 		
@@ -295,7 +295,7 @@ class SemanticObjects ():
 			; a owl:DatatypeProperty
 			}}"""
 		
-		props = self.convert (self.get_query (q), [("props", ["prop"],)])["props"] + list (s_all-s_domain-s_inverse)
+		props = self.convert (self.get_query (q), [("props", ["prop"],)])["props"]# + list (s_all-s_domain-s_inverse)
 		
 		return props
 		
