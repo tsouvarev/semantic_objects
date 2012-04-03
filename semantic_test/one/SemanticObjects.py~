@@ -115,7 +115,7 @@ class SemanticObjects ():
 
 					p = prop[i]
 
-					if p["type"] != "bnode":
+					if "type" in p and p["type"] != "bnode":
 						
 #						if p["type"] == "uri": p = self.get_resource (p["value"])
 #						else: p = p["value"]
@@ -136,7 +136,8 @@ class SemanticObjects ():
 						p = prop[i]
 						v = prop[j]
 
-						if p["type"] != "bnode" and v["type"] != "bnode":
+						if "type" in p and p["type"] != "bnode" and \
+							"type" in v and v["type"] != "bnode":
 
 							p = p["value"]
 							
@@ -154,7 +155,7 @@ class SemanticObjects ():
 
 						for n in val:
 
-							if p[n]["type"] != "bnode": 
+							if "type" in p[n] and p[n]["type"] != "bnode": 
 								
 #								if p[n]["type"] == "uri": v = self.get_resource (p[n]["value"])
 #								else: v = p[n]["value"]
@@ -221,47 +222,47 @@ class SemanticObjects ():
 	
 	def get_available_properties (self, class_uri):
 	
-		q_all = """select distinct ?prop 
+		q_all = """select distinct ?all ?inverse ?domain
 			where 
 			{ 
-				{ ?prop a owl:ObjectProperty }
+				{ 
+					?all a owl:ObjectProperty 
+				}
 				union
-				{ ?prop a owl:DatatypeProperty }
+				{ 
+					?all a owl:DatatypeProperty 
+				}
+				union 
+				{
+					?inverse owl:inverseOf ?p 
+					; a owl:ObjectProperty
+				}
+				union
+				{
+					?inverse owl:inverseOf ?p
+					; a owl:DatatypeProperty
+				}
+				union 
+				{
+					?domain rdfs:domain ?d 
+					; a owl:ObjectProperty
+				}
+				union
+				{
+					?domain rdfs:domain ?d
+					; a owl:DatatypeProperty
+				}
 			}"""
-			
-		q_inverse = """select distinct ?prop 
-				where 
-				{ 
-					{
-					?prop owl:inverseOf ?p 
-					; a owl:ObjectProperty
-					}
-					union
-					{
-					?prop owl:inverseOf ?p
-					; a owl:DatatypeProperty
-					}					
-				}"""
-			
-		q_domain = """select distinct ?prop 
-				where 
-				{ 
-					{
-					?prop rdfs:domain ?d 
-					; a owl:ObjectProperty
-					}
-					union
-					{
-					?prop rdfs:domain ?d
-					; a owl:DatatypeProperty
-					}
-				}"""
 		
-		s_all = set (self.convert (self.get_query (q_all), [("props", ["prop"],)])["props"])
-		s_inverse = set (self.convert (self.get_query (q_inverse), [("props", ["prop"],)])["props"])
-		s_domain = set (self.convert (self.get_query (q_domain), [("props", ["prop"],)])["props"])
+		q = self.convert (self.get_query (q_all), [	("all", ["all"],), 
+								("inverse", ["inverse"],), 
+								("domain", ["domain"],)])
 		
-		print "s_all: ", s_all 
+		s_all = set (q["all"])
+		s_inverse = set (q["inverse"])
+		s_domain = set (q["domain"])
+		
+#		print "s_all: ", s_all 
 		
 		obj = self.classes[class_uri]
 		
@@ -295,7 +296,7 @@ class SemanticObjects ():
 			; a owl:DatatypeProperty
 			}}"""
 		
-		props = self.convert (self.get_query (q), [("props", ["prop"],)])["props"]# + list (s_all-s_domain-s_inverse)
+		props = self.convert (self.get_query (q), [("props", ["prop"],)])["props"] + list (s_all-s_domain-s_inverse)
 		
 		return props
 		
@@ -458,10 +459,11 @@ class SemanticObjects ():
 
 		def set_attr (s, key, val):
 
-			s.__dict__[key] = val
 			print "key '%s' to '%s'" % (key, val)
+			
 			if key not in s.available_properties:
 			
+				raise KeyError (key)
 				base = self.classes[s.uri].__class__
 				print "class name: ", base.uri
 			
@@ -472,7 +474,19 @@ class SemanticObjects ():
 						# <%s> rdfs:domain <%s> . \ (key, key, base.uri, s.uri, key, val))
 						
 			else: 
+				try: 
+					old_val = getattr (s,key)
+					print "old: ", old_val
+					self.delete (self.prefixes + "delete where {<%s> <%s> <%s>}" % (s.uri, key, old_val))
+				
+				except: pass
+					
+				
 				self.insert (self.prefixes + "insert {<%s> <%s> <%s>}" % (s.uri, key, val))
+				print "inserted: ", val
+				
+				#s.__dict__[key] = val
+			
 
 		def del_attr (s, key):
 		

@@ -17,20 +17,21 @@ def test(req):
 #	print dir (Book.objects.all())
 #	
 #	# "http://www.w3.org/2002/07/owl#Class"
-	Chardonnay = Factory ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
+	Chardonnay = Factory ("http://www.w3.org/2002/07/owl#Class")
 	t = Chardonnay.objects.all ()
-	html = "%s<br><br>" % t
+	html = ""
+#	html = "%s<br><br>" % t
 #	html = "m: %s<br><br>" % escape (type (Chardonnay.objects))
 #	html = "get: %s<br><br>" %  (t.filter(uri="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#BancroftChardonnay"))
 #	html = "dir: %s<br><br>" % escape (dir (Chardonnay.objects))
 #	html += "len: %s<br><br>" % len (t)
 	
 #	if type (t) is list:
-	obj = t.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#MountadamChardonnay")
+	obj = t.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test")
 	
 	html += "<br><br>%s<br><br>" % (obj.available_properties)
 	
-#	obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#one"
+#	obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#otwo"
 #	obj ["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property5"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#two"
 	
 #	del obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property2"]

@@ -57,8 +57,7 @@ class FourstoreSparqlBackend (Backend):
 		try: res = urlopen (self.address, urlencode (values))
 		except URLError, e: 
 			
-			print e.reason
-			return False
+			raise Exception (e.reason)
 		else:
 			return res.read()
 	
