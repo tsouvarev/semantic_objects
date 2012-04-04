@@ -464,6 +464,7 @@ class SemanticObjects ():
 			if key not in s.available_properties:
 			
 				raise KeyError (key)
+
 				base = self.classes[s.uri].__class__
 				print "class name: ", base.uri
 			
@@ -485,8 +486,7 @@ class SemanticObjects ():
 				self.insert (self.prefixes + "insert {<%s> <%s> <%s>}" % (s.uri, key, val))
 				print "inserted: ", val
 				
-				#s.__dict__[key] = val
-			
+				s.__dict__[key] = val
 
 		def del_attr (s, key):
 		
@@ -494,20 +494,25 @@ class SemanticObjects ():
 			
 			self.delete (self.prefixes + "delete {<%s> <%s> ?v}" % (s.uri, key))
 
+		def create_instance (s, name):
+
+			self.insert (self.prefixes + "insert {<%s> a <:s>" % (name, s.uri, ))
+			print "created instance: '%s' of class '%s'" % (name, s.uri,)
+
 		r.__getitem__ = get_attr
 		r.__delitem__ = del_attr
 		r.__setitem__ = set_attr
-		
+
 		r.__getattr__ = get_attr
-#		r.__setattr__ = set_attr
-		
+		r.__init__ = create_instance 
+	#		r.__setattr__ = set_attr
+
 		r.available_properties = property (lambda x: self.get_available_properties (r.uri))
-		# r.__getattribute__ = get
-	
- 		self.classes[uri] = r
- 		
-		return r
-	
+			# r.__getattribute__ = get
+
+		self.classes[uri] = r
+        return r
+
 	# функция получения экземпляров 
 	# class_uri - идентификатор класса экземпляров
 	def get_resources (self, class_uri):
