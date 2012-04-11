@@ -3,31 +3,7 @@
 
 import SPARQLWrapper as wrap
 from DBBackends import FourstoreSparqlBackend
-
-class Thing (object):
-
-    def __repr__ (self): 
-    
-        return self.uri
-
-    def __str__ (self):
-    
-        return self.uri
-    
-    def __unicode__ (self):
-    
-        return self.uri
-
-    def __getattr__ (self, key):        
-        
-        return self.get_property (s.uri, key)
-        
-    def __setattr__ (self, key, val):
-    
-        self.__dict__[key] = val
-            
-    __getitem__ = __getattr__
-    __setitem__ = __setattr__
+from Connection import QueryParser, Connection
 
 # Класс, отображающий RDF-триплеты в объекты Python
 class SemanticObjects ():
@@ -35,135 +11,12 @@ class SemanticObjects ():
     def __init__ (self, addr):
 
         # запоминаем SPARQL-endpoint
-        #self.sparql = SPARQLWrapper(addr)
-        self.db = FourstoreSparqlBackend (addr)
-        print "addr: ", addr
-        
-        # строка, содержащая в итоге все нужные запросам 
-        # префиксы для более короткого написания URI ресурсов
-        self.prefixes = ""
-        
-        # пространства имен 
-        self.namespaces = {}
-        # сокращение для self.namespaces
-        self.ns = self.namespaces
+		self.parser = QueryParser (Connection (addr, FourstoreSparqlBackend))
         
         # список базовых классов, понадобится при запросах классов и ресурсов из хранилища
         # также играет роль кэша классов
         self.classes = {}
         self.superclasses = {}
-
-        # заранее добавляем пространства, которые точно понадобятся
-        self.ns["owl"] = "http://www.w3.org/2002/07/owl#"
-        self.ns["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#"
-        self.ns["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-
-        # формируем сразу шапку запросов из префиксов
-        for ns in self.ns: self.prefixes += "PREFIX %s: <%s>\n" % (ns, self.ns[ns])
-
-    def get_query (self, query):
-    
-        return self.db.query (self.prefixes + query)
-
-    # красивая печать результатов
-    def print_results (self, results):
-
-        print results
-
-        for result in results["results"]["bindings"]:
-
-            for i in results["head"]["vars"]: print "%s: %s" % (i, result[i]["value"])
-            print
-
-    # добавление пространства имен
-    def add_namespace (self, name, namespace):
-
-        self.namespaces[name] = namespace
-        
-        # сразу обновляем шапку запросов
-        self.prefixes += "PREFIX %s: <%s>\n" % (name, namespace)
-
-    # конвертация результатов от get_query в более удобный вид (description is obsoleted)
-    # properties - результаты от get_query
-    # schema - схема преобразования
-    #
-    # schema состоит из кортежей соответствия нового названия, которое хотим дать, и свойств из properties
-    #
-    # каждый кортеж преобразовывается в атрибут итогового объекта
-    #
-    # первый параметр в кортеже есть название для атрибута в итоговом объекте
-    # если в кортеже второй параметр строка, то атрибут будет строковым
-    # если в кортеже второй параметр список, то множество значений из properties
-    # попадут в один и тот же список. в списке может быть произвольное число элементов, из них и будет 
-    # формироваться атрибут в итоговом объекте
-    # 
-    # например, кортеж ("a", "b") означает взять из properties свойство "b" и 
-    # записать его в итоговый объект как атрибут "a"
-    # кортеж ("a", ["b","c"]) означает взять из properties все свойства под названиями "b" и "c" и
-    # записать их в один список под названием "a"
-    def convert (self, properties, schemas, split = False, create = False):
-
-        c = {}
-        
-        for schema in schemas:
-        
-            if len (schema) == 1:
-        
-                i, = schema
-        
-                for prop in properties["results"]["bindings"]:
-
-                    p = prop[i]
-
-                    if "type" in p and p["type"] != "bnode":
-                        
-#                       if p["type"] == "uri": p = self.get_resource (p["value"])
-#                       else: p = p["value"]
-                        p = p["value"]
-                    
-                        c[i] = p
-        
-            else:
-        
-                name,val = schema
-
-                if type(val) == str:
-
-                    i,j = name,val
-
-                    for prop in properties["results"]["bindings"]:
-
-                        p = prop[i]
-                        v = prop[j]
-
-                        if "type" in p and p["type"] != "bnode" and \
-                            "type" in v and v["type"] != "bnode":
-
-                            p = p["value"]
-                            
-#                           if v["type"] == "uri": v = self.get_resource (v["value"])
-#                           else: v = v["value"]
-                            v = v["value"]
-                    
-                            c[p] = v
-
-                elif type(val) == list:
-
-                    c[name] = []
-
-                    for p in properties["results"]["bindings"]:
-
-                        for n in val:
-
-                            if "type" in p[n] and p[n]["type"] != "bnode": 
-                                
-#                               if p[n]["type"] == "uri": v = self.get_resource (p[n]["value"])
-#                               else: v = p[n]["value"]
-                                v = p[n]["value"]
-                
-                                c[name].append (v)
-
-        return c
 
     def get_class_properties (self, uri):
     
@@ -468,7 +321,7 @@ class SemanticObjects ():
                 base = self.classes[s.uri].__class__
                 print "class name: ", base.uri
             
-                self.insert (self.prefixes + 
+                self.conn.insert (self.prefixes + 
                         "insert {<%s> a owl:ObjectProperty . \
                         <%s> rdfs:domain <%s> . \
                         <%s> <%s> <%s>}" % (key, key, base.uri, s.uri, key, val))
@@ -478,12 +331,12 @@ class SemanticObjects ():
                 try: 
                     old_val = getattr (s,key)
                     print "old: ", old_val
-                    self.delete (self.prefixes + "delete where {<%s> <%s> <%s>}" % (s.uri, key, old_val))
+                    self.conn.delete (self.prefixes + "delete where {<%s> <%s> <%s>}" % (s.uri, key, old_val))
                 
                 except: pass
                     
                 
-                self.insert (self.prefixes + "insert {<%s> <%s> <%s>}" % (s.uri, key, val))
+                self.conn.insert (self.prefixes + "insert {<%s> <%s> <%s>}" % (s.uri, key, val))
                 print "inserted: ", val
                 
                 s.__dict__[key] = val
@@ -492,7 +345,7 @@ class SemanticObjects ():
         
             del s.__dict__[key]
             
-            self.delete (self.prefixes + "delete {<%s> <%s> ?v}" % (s.uri, key))
+            self.conn.delete (self.prefixes + "delete {<%s> <%s> ?v}" % (s.uri, key))
 
         def create_instance (s, name):
 
@@ -507,7 +360,7 @@ class SemanticObjects ():
 
             if not q: 
 
-                self.insert (self.prefixes + "insert {<%s> a <%s>}" % (name, s.uri, ))
+                self.conn.insert (self.prefixes + "insert {<%s> a <%s>}" % (name, s.uri, ))
                 print "created instance: '%s' of class '%s'" % (name, s.uri,)
             else: print "instance exists: ", name
 
@@ -588,14 +441,6 @@ class SemanticObjects ():
         
         return r
     
-    def insert (self, query):
-    
-        print self.db.insert (query)
-        
-    def delete (self, query):
-    
-        print self.db.delete (query)
-
     def test (self):
     
 #       self.insert ("insert {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class>}")
