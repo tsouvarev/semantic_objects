@@ -26,11 +26,11 @@ def test(req):
 #	html += "len: %s<br><br>" % len (t)
 	
 #	if type (t) is list:
-	obj = t.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tst2")
+	obj = t#.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tst2")
 #t2 = obj.__class__ ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tst2")
 #	t2["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"]="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tttsfsdfs"
 	
-	html += "<br><br>%s<br><br>%s<br><br>" % (obj.uri, obj.available_properties)
+	html += "<br><br>%s<br><br><br><br>" % (obj)#, obj.available_properties)
 	
 #	obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#otwo"
 #	obj ["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property5"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#two"
@@ -38,7 +38,9 @@ def test(req):
 #	del obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property2"]
 	
 	#print obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"]
-	
+
+	return HttpResponse (html)
+
 	for prop in obj.available_properties:
 
 #		x = obj

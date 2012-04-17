@@ -6,14 +6,15 @@ from DBBackends import *
 
 class Connection ():
 
-	def __init__ (self, addr, backend):
+    def __init__ (self, backend):
+    
+        if not isinstance (backend, Backend): raise Exception ("Given wrong backend for connection: %s" % backend)
 
-	    if not isinstance (backend, Backend): raise Exception ("Given wrong backend for connection: %s" % backend)
-
-		self.db = backend (addr)
+        self.db = backend
 
     def query (self, query):
 
+#        print "q"
         return self.db.query (query)
 
     def insert (self, query):
@@ -24,14 +25,14 @@ class Connection ():
     
         return self.db.delete (query)
 
-class QueryParser ():
+class QueryResultsParser ():
 
-	def __init__ (self, conn):
+    def __init__ (self):
 
-        if not isinstance (conn, Connection): raise Exception ("Given wrong connection for QueryParser: %s" % conn)
+#        if not isinstance (conn, Connection): raise Exception ("Given wrong connection for QueryParser: %s" % conn)
 
         # запоминаем SPARQL-endpoint
-        self.conn = conn
+#        self.conn = conn
 
         # строка, содержащая в итоге все нужные запросам 
         # префиксы для более короткого написания URI ресурсов
@@ -42,22 +43,17 @@ class QueryParser ():
         # сокращение для self.namespaces
         self.ns = self.namespaces
         
-        # список базовых классов, понадобится при запросах классов и ресурсов из хранилища
-        # также играет роль кэша классов
-        self.classes = {}
-        self.superclasses = {}
-
         # заранее добавляем пространства, которые точно понадобятся
         self.ns["owl"] = "http://www.w3.org/2002/07/owl#"
         self.ns["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#"
         self.ns["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 
         # формируем сразу шапку запросов из префиксов
-        for ns in self.ns: self.prefixes += "PREFIX %s: <%s>\n" % (ns, self.ns[ns])		
+        for ns in self.ns: self.prefixes += "PREFIX %s: <%s>\n" % (ns, self.ns[ns])     
 
-    def get_query (self, query):
+#    def get_query (self, query):
     
-        return self.conn.query (self.prefixes + query)
+#        return self.conn.query (self.prefixes + query)
 
     # красивая печать результатов
     def print_results (self, results):
