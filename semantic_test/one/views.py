@@ -10,67 +10,67 @@ from django.utils.html import escape
 
 def test(req):
 
-#	w = Chianti()	
-	#Book (name = "Discworld", store = "Dom knig", num = 100).save()
-#	print type ()
-#	print dir (Book.objects.all())
-#	
-#	# "http://www.w3.org/2002/07/owl#Class"
-	Chardonnay = Factory ("http://www.w3.org/2002/07/owl#Class")
-	t = Chardonnay.objects.all ()
-	html = ""
-#	html = "%s<br><br>" % t
-#	html = "m: %s<br><br>" % escape (type (Chardonnay.objects))
-#	html = "get: %s<br><br>" %  (t.filter(uri="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#BancroftChardonnay"))
-#	html = "dir: %s<br><br>" % escape (dir (Chardonnay.objects))
-#	html += "len: %s<br><br>" % len (t)
-	
-#	if type (t) is list:
-	obj = t#.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tst2")
+#   w = Chianti()   
+    #Book (name = "Discworld", store = "Dom knig", num = 100).save()
+#   print type ()
+#   print dir (Book.objects.all())
+#   
+#   # "http://www.w3.org/2002/07/owl#Class"
+    Chardonnay = Factory ("http://www.w3.org/2002/07/owl#Class")
+    t = Chardonnay.objects.all ()
+    html = ""
+#   html = "%s<br><br>" % t
+#   html = "m: %s<br><br>" % escape (type (Chardonnay.objects))
+#   html = "get: %s<br><br>" %  (t.filter(uri="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#BancroftChardonnay"))
+#   html = "dir: %s<br><br>" % escape (dir (Chardonnay.objects))
+#   html += "len: %s<br><br>" % len (t)
+    
+#   if type (t) is list:
+    obj = t.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tst2")
 #t2 = obj.__class__ ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tst2")
-#	t2["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"]="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tttsfsdfs"
-	
-	html += "<br><br>%s<br><br><br><br>" % (obj)#, obj.available_properties)
-	
-#	obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#otwo"
-#	obj ["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property5"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#two"
-	
-#	del obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property2"]
-	
-	#print obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"]
+#   t2["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"]="http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#tttsfsdfs"
+    
+    html += "<br><br>%s<br><br>%s<br><br>" % (obj, obj.available_properties)
+    
+#   obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#otwo"
+#   obj ["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property5"] = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#two"
+    
+#   del obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property2"]
+    
+    #print obj["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test_property"]
 
-	return HttpResponse (html)
+    return HttpResponse (html)
 
-	for prop in obj.available_properties:
+    for prop in obj.available_properties:
 
-#		x = obj
-#	
-#		#html += "%s<br>" % (escape (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn"]))
-		#html += "%s: %s<br>" % (prop, getattr (obj, prop))
-		try:
-			html += "%s: %s<br>" % (prop, getattr (obj, prop))
-		except: 
-			html += "%s: %s<br>" % (prop, None)
-##		html += "%s<br>" % (x.available_properties)
-#		
-##		html += "%s<br><br>" % (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor"])
+#       x = obj
+#   
+#       #html += "%s<br>" % (escape (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn"]))
+        #html += "%s: %s<br>" % (prop, getattr (obj, prop))
+        try:
+            html += "%s: %s<br>" % (prop, getattr (obj, prop))
+        except: 
+            html += "%s: %s<br>" % (prop, None)
+##      html += "%s<br>" % (x.available_properties)
+#       
+##      html += "%s<br><br>" % (x["http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor"])
 
-##		html += "%s<br><br>" % (escape (x.__class__.__mro__))
-##	
-##		for p in x.__dict__:
-##		
-##			html += "%s: <br>" % (x[p])
-#	
-#		html += "<br>"
-			
-#	obj = t.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chianti")
-#	
-#	html += "%s: %s<br>" % (obj.uri, obj.available_properties)
-#	
-#	else:
-#	
-#		html += "%s<br><br>" % t.uri
-#	print dumps (a[0].__dict__)
-#	print a[0].hasFlavor
+##      html += "%s<br><br>" % (escape (x.__class__.__mro__))
+##  
+##      for p in x.__dict__:
+##      
+##          html += "%s: <br>" % (x[p])
+#   
+#       html += "<br>"
+            
+#   obj = t.get (uri = "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chianti")
+#   
+#   html += "%s: %s<br>" % (obj.uri, obj.available_properties)
+#   
+#   else:
+#   
+#       html += "%s<br><br>" % t.uri
+#   print dumps (a[0].__dict__)
+#   print a[0].hasFlavor
 
-	return HttpResponse (html)
+    return HttpResponse (html)

@@ -8,15 +8,17 @@ from QueryResultParser import convert
 
 class Class ():
 
-	def __init__ (self, uri):
+    def __init__ (self, uri):
 
-		self.uri = uri
+        self.uri = uri
 
 class Resource ():
 
-	def __init__ (self, *args, **kwargs):
+    def __init__ (self, *args, **kwargs):
 
-		raise Exception ("You cannot instantiate resource")
+        raise Exception ("You cannot instantiate resource")
+
+
 
 # Класс, отображающий RDF-триплеты в объекты Python
 class SemanticObjects ():
@@ -24,12 +26,19 @@ class SemanticObjects ():
     def __init__ (self, connection):
 
         # запоминаем SPARQL-endpoint
-		self.conn = connection
+        self.conn = connection
+
+        self.ns = {}
+        self.ns["owl"] = "http://www.w3.org/2002/07/owl#"
+        self.ns["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        self.ns["rdfs"] =  "http://www.w3.org/2000/01/rdf-schema#"
+
+        self.prefixes = "\n".join (["prefix %s: <%s>" % (k, self.ns[k]) for k in self.ns])
         
         # список базовых классов, понадобится при запросах классов и ресурсов из хранилища
         # также играет роль кэша классов
-		self.classes = {}
-		self.superclasses = {}
+        self.classes = {}
+        self.superclasses = {}
 
     def get_class_properties (self, uri):
     
@@ -66,7 +75,7 @@ class SemanticObjects ():
                 """ % ((uri,)*4)
         
         # добавляем найденные свойства в словарь, понадобится при создании класса
-        props = convert (self.conn.query (q), [("prop", "val",)])
+        props = convert (self.conn.query (self.prefixes+q), [("prop", "val",)])
         
         return props
         
@@ -82,7 +91,7 @@ class SemanticObjects ():
                 }
             """ % uri
         
-        props = convert (self.conn.query (q), [("prop", "val", )])
+        props = convert (self.conn.query (self.prefixes+q), [("prop", "val", )])
         
         return props
     
@@ -120,7 +129,7 @@ class SemanticObjects ():
                 }
             }"""
         
-        q = convert (self.conn.query (q_all), [ ("all", ["all"],), 
+        q = convert (self.conn.query (self.prefixes+q_all), [ ("all", ["all"],), 
                                 ("inverse", ["inverse"],), 
                                 ("domain", ["domain"],)])
         
@@ -162,7 +171,7 @@ class SemanticObjects ():
             ; a owl:DatatypeProperty
             }}"""
         
-        props = convert (self.conn.query (q), [("props", ["prop"],)])["props"] + list (s_all-s_domain-s_inverse)
+        props = convert (self.conn.query (self.prefixes+q), [("props", ["prop"],)])["props"] + list (s_all-s_domain-s_inverse)
         
         return props
         
@@ -237,7 +246,7 @@ class SemanticObjects ():
         
         # добавляем найденные свойства в словарь, понадобится при создании класса
         
-        val = convert (self.conn.query (q), [("val",)])
+        val = convert (self.conn.query (self.prefixes+q), [("val",)])
         
         if "val" in val: 
         
@@ -283,12 +292,12 @@ class SemanticObjects ():
                     {
                         <%s> a owl:Class ;
                         owl:intersectionOf ( ?x ?class ) .
-						class a owl:Class .
+                        ?class a owl:Class .
                         ?x a owl:Class
                     }
                 }""" % ((uri,)*5)
-        
-        a = convert (self.conn.query (q), [("classes", ["class"], )])["classes"]
+
+        a = convert (self.conn.query (self.prefixes+q), [("classes", ["class"], )])["classes"]
         
         # сразу заполняем кэш классов, если класс еще не встречался
         for i in a: 
@@ -315,43 +324,51 @@ class SemanticObjects ():
         # создаем новый тип, который потом и вернем
         r = type (str(name), tuple (bases), props)
         r.uri = uri
-        
+        r.complete = False
+
         r.__repr__ = lambda self: u"" + self.uri
         r.__str__ = lambda self: u"" + self.uri
 
         def get_attr (s, key):
 
+            if hasattr (s, key): return getattr (s, key)
+
+            if not s.complete: 
+                
+                s.__bases__ = tuple (self.get_class_superclasses (s.uri))
+                s.complete = True
+            
             return self.get_property (s.uri, key)
 
         def set_attr (s, key, val):
 
-			print "key '%s' to '%s'" % (key, val)
-			if key not in s.available_properties:
+            print "key '%s' to '%s'" % (key, val)
+            if key not in s.available_properties:
             
-				raise KeyError (key)
+                raise KeyError (key)
 
-				base = self.classes[s.uri].__class__
-				print "class name: ", base.uri
-				
-				self.conn.insert (self.prefixes + 
+                base = self.classes[s.uri].__class__
+                print "class name: ", base.uri
+                
+                self.conn.insert (self.prefixes + 
                         "insert {<%s> a owl:ObjectProperty . \
                         <%s> rdfs:domain <%s> . \
                         <%s> <%s> <%s>}" % (key, key, base.uri, s.uri, key, val))
                         # <%s> rdfs:domain <%s> . \ (key, key, base.uri, s.uri, key, val))
                         
-			else: 
-				try: 
-					
-					old_val = getattr (s,key)
-					print "old: ", old_val
-					self.conn.delete (self.prefixes + "delete where {<%s> <%s> <%s>}" % (s.uri, key, old_val))
+            else: 
+                try: 
+                    
+                    old_val = getattr (s,key)
+                    print "old: ", old_val
+                    self.conn.delete (self.prefixes + "delete where {<%s> <%s> <%s>}" % (s.uri, key, old_val))
                 
-				except: pass                    
+                except: pass                    
                 
-				self.conn.insert (self.prefixes + "insert {<%s> <%s> <%s>}" % (s.uri, key, val))
-				print "inserted: ", val
-				
-				s.__dict__[key] = val
+                self.conn.insert (self.prefixes + "insert {<%s> <%s> <%s>}" % (s.uri, key, val))
+                print "inserted: ", val
+                
+                s.__dict__[key] = val
 
         def del_attr (s, key):
         
@@ -368,7 +385,7 @@ class SemanticObjects ():
                     }
                     """ % name
 
-            q = convert (self.conn.query (q), [("class", ["class"], )])["class"]
+            q = convert (self.conn.query (self.prefixes+q), [("class", ["class"], )])["class"]
 
             if not q: 
 
@@ -408,7 +425,7 @@ class SemanticObjects ():
         
         # список названий всех экземпляров из онтологии
         
-        instances = convert (self.conn.query (q), [("inst", ["inst"], )])["inst"]
+        instances = convert (self.conn.query (self.prefixes+q), [("inst", ["inst"], )])["inst"]
         
         res = []
         
@@ -434,7 +451,7 @@ class SemanticObjects ():
                     }
                 """ % uri
         
-            t = convert (self.conn.query (q), [("type",)])
+            t = convert (self.conn.query (self.prefixes+q), [("type",)])
         
         else:
         
@@ -463,10 +480,11 @@ class SemanticObjects ():
 #       
 #       print self.get_properties ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
 
-		q = "ask {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> a <http://www.w3.org/2002/07/owl#Class>}"
-		print convert (self.conn.query (q), [("")])
-		
-		pass
+        q = "ask {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> a <http://www.w3.org/2002/07/owl#Class>}"
+        print convert (self.conn.query (q), [("")])
+
+        
+        pass
             
             
             
