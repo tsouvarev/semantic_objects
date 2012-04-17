@@ -3,7 +3,9 @@
 
 from django.db.models import *
 from django.db.models.query import QuerySet
-from SemanticObjects import *
+from SemanticObjects.SemanticObjects import *
+from SemanticObjects.Connection import Connection
+from SemanticObjects.DBBackends import *
 
 # Create your models here.
 
@@ -13,7 +15,9 @@ class SemanticQuerySet (QuerySet):
 		
 		super(SemanticQuerySet, self).__init__(model)
 		
-		self.s = SemanticObjects ("http://fourstore.avalon.ru:80")
+		conn = Connection (FourstoreSparqlBackend ("http://fourstore.avalon.ru:80"))
+		
+		self.s = SemanticObjects (conn)
 		#self.s.add_namespace ("wines", "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#")
 		self.uri = uri
 		

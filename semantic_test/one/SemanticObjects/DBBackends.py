@@ -72,6 +72,7 @@ class FourstoreSparqlBackend (Backend):
 			
 			print e.reason
 			return False
+	    
 		else:
 			return res.read()
 		
