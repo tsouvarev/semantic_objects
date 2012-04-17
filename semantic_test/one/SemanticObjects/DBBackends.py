@@ -4,7 +4,6 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 from urllib2 import urlopen, HTTPError
 from urllib import urlencode
-from httplib import HTTPConnection
 
 class Backend (object):
 

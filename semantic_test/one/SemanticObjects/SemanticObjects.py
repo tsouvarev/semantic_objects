@@ -3,7 +3,8 @@
 
 import SPARQLWrapper as wrap
 from DBBackends import FourstoreSparqlBackend
-from Connection import QueryResultsParser, Connection
+from Connection import Connection
+from QueryResultParser import convert    
 
 class Class ():
 
@@ -23,7 +24,6 @@ class SemanticObjects ():
     def __init__ (self, connection):
 
         # запоминаем SPARQL-endpoint
-		self.parser = QueryResultsParser ()
 		self.conn = connection
         
         # список базовых классов, понадобится при запросах классов и ресурсов из хранилища
@@ -66,7 +66,7 @@ class SemanticObjects ():
                 """ % ((uri,)*4)
         
         # добавляем найденные свойства в словарь, понадобится при создании класса
-        props = self.parser.convert (self.conn.query (q), [("prop", "val",)])
+        props = convert (self.conn.query (q), [("prop", "val",)])
         
         return props
         
@@ -82,7 +82,7 @@ class SemanticObjects ():
                 }
             """ % uri
         
-        props = self.parser.convert (self.conn.query (q), [("prop", "val", )])
+        props = convert (self.conn.query (q), [("prop", "val", )])
         
         return props
     
@@ -120,7 +120,7 @@ class SemanticObjects ():
                 }
             }"""
         
-        q = self.parser.convert (self.conn.query (q_all), [ ("all", ["all"],), 
+        q = convert (self.conn.query (q_all), [ ("all", ["all"],), 
                                 ("inverse", ["inverse"],), 
                                 ("domain", ["domain"],)])
         
@@ -162,7 +162,7 @@ class SemanticObjects ():
             ; a owl:DatatypeProperty
             }}"""
         
-        props = self.parser.convert (self.conn.query (q), [("props", ["prop"],)])["props"] + list (s_all-s_domain-s_inverse)
+        props = convert (self.conn.query (q), [("props", ["prop"],)])["props"] + list (s_all-s_domain-s_inverse)
         
         return props
         
@@ -237,7 +237,7 @@ class SemanticObjects ():
         
         # добавляем найденные свойства в словарь, понадобится при создании класса
         
-        val = self.parser.convert (self.conn.query (q), [("val",)])
+        val = convert (self.conn.query (q), [("val",)])
         
         if "val" in val: 
         
@@ -288,7 +288,7 @@ class SemanticObjects ():
                     }
                 }""" % ((uri,)*5)
         
-        a = self.parser.convert (self.conn.query (q), [("classes", ["class"], )])["classes"]
+        a = convert (self.conn.query (q), [("classes", ["class"], )])["classes"]
         
         # сразу заполняем кэш классов, если класс еще не встречался
         for i in a: 
@@ -310,7 +310,7 @@ class SemanticObjects ():
         name = t[1] if len (t) > 1 else uri.rsplit (":")[1]
         
         props = {} #self.get_class_properties (uri)
-        bases = {}#self.get_class_superclasses (uri)
+        bases = {} #self.get_class_superclasses (uri)
         
         # создаем новый тип, который потом и вернем
         r = type (str(name), tuple (bases), props)
@@ -368,7 +368,7 @@ class SemanticObjects ():
                     }
                     """ % name
 
-            q = self.parser.convert (self.conn.query (q), [("class", ["class"], )])["class"]
+            q = convert (self.conn.query (q), [("class", ["class"], )])["class"]
 
             if not q: 
 
@@ -408,7 +408,7 @@ class SemanticObjects ():
         
         # список названий всех экземпляров из онтологии
         
-        instances = self.parser.convert (self.conn.query (q), [("inst", ["inst"], )])["inst"]
+        instances = convert (self.conn.query (q), [("inst", ["inst"], )])["inst"]
         
         res = []
         
@@ -434,7 +434,7 @@ class SemanticObjects ():
                     }
                 """ % uri
         
-            t = self.parser.convert (self.conn.query (q), [("type",)])
+            t = convert (self.conn.query (q), [("type",)])
         
         else:
         
@@ -464,7 +464,7 @@ class SemanticObjects ():
 #       print self.get_properties ("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Chardonnay")
 
 		q = "ask {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#test> a <http://www.w3.org/2002/07/owl#Class>}"
-		print self.parser.convert (self.conn.query (q), [("")])
+		print convert (self.conn.query (q), [("")])
 		
 		pass
             
