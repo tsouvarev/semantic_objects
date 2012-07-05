@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from pprint import pprint
-from symbol import factor
-from rdflib import Literal, URIRef
+from collections import defaultdict
+from rdflib import Literal
 
 from rdflib.namespace import OWL, RDF, RDFS, split_uri
 from RDFSQueries import RDFSQueries
@@ -71,14 +70,15 @@ class Thing(object):
     def __getattr__(self, item):
 
         if not self.factory.query.has_attr(self.uri, item):
-            # raise AttributeError("Object '%s' has no attribute '%s'" % (self.uri, item))
             return None
 
-        # don't forget to call super
         if item not in self.properties:
             return None
 
-        return self.properties[item].to_python()
+        if item == unicode(RDFS.label):
+            return {x.lang: x.to_python() for x in self.properties[item]}
+
+        return [x.to_python() for x in self.properties[item]]
 
 
 class Factory(object):
@@ -114,12 +114,17 @@ class Factory(object):
                 base_classes = [Thing]
 
             properties = self.query.available_class_properties(class_uri)
+
+            p = defaultdict(list)
+            for prop in properties:
+                p[prop["prop"]["value"]].append(Property(self, prop))
+
             namespace, classname = split_uri(unicode(class_uri))
 
             kwargs = {
                 "uri": class_uri,
                 "factory": self,
-                "properties": {x["prop"]["value"]: Property(self, x) for x in properties}
+                "properties": p,
             }
 
             cl = type(str(classname), tuple(base_classes), kwargs)
@@ -141,8 +146,12 @@ class Factory(object):
 
             obj = cl(obj_uri)
 
-            properties = self.query.available_object_properties(obj_uri)
-            obj.properties = {x["prop"]["value"]: Property(self, x) for x in properties}
+            raw_properties = self.query.available_object_properties(obj_uri)
+
+            p = defaultdict(list)
+            for property in raw_properties:
+                p[property["prop"]["value"]].append(Property(self, property))
+            obj.properties = p
 
             return obj
 
