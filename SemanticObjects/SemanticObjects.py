@@ -70,10 +70,10 @@ class Thing(object):
     def __getattr__(self, item):
 
         if not self.factory.query.has_attr(self.uri, item):
-            return None
+            raise KeyError(item)
 
         if item not in self.properties:
-            return None
+            raise KeyError(item)
 
         if item == unicode(RDFS.label):
             return {x.lang: x.to_python() for x in self.properties[item]}
