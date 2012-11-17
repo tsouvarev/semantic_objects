@@ -40,7 +40,7 @@ class SemanticObjects ():
         self.classes = {}
         self.superclasses = {}
 
-    def get_class_properties (self, uri):
+    def get_class_properties(self, uri):
     
         # запрос на определение свойств класса в нем же непосредственно определенных
         # (не из иерархии классов)

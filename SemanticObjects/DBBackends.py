@@ -20,6 +20,27 @@ class Backend (object):
     @abstract
     def delete (self, query): return
 
+class VirtuosoBackend(Backend):
+
+    def __init__(self, address):
+
+        self.endpoint = SPARQLWrapper(address+"/sparql/")
+
+    def query(self, query):
+        super(VirtuosoBackend, self).query(query)
+
+        self.endpoint.setQuery(query)
+
+        self.endpoint.setReturnFormat(JSON)
+        results = self.endpoint.query().convert()
+
+        return results
+
+    def insert (self, query): return
+
+    def update (self, query): return
+
+    def delete (self, query): return
 
 class FourstoreSparqlBackend (Backend):
 
