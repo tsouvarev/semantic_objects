@@ -1,24 +1,32 @@
 #! /bin/python
 # -*- coding: utf-8 -*-
 
-from SPARQLWrapper import SPARQLWrapper, JSON
-from urllib2 import urlopen, HTTPError
+from SPARQLWrapper import SPARQLWrapper, JSON, RDF, XML, TURTLE, N3
+from urllib2 import urlopen, HTTPError, URLError
 from urllib import urlencode
 from abc import abstractmethod as abstract
 
-class Backend (object):
+class Backend(object):
 
     @abstract
-    def query (self, query): return
+    def query(self, query):
+        return
+
+    @abstract
+    def ask(self, query):
+        return
     
     @abstract
-    def insert (self, query): return
+    def insert(self, query):
+        return
 
     @abstract
-    def update (self, query): return    
+    def update(self, query):
+        return
 
     @abstract
-    def delete (self, query): return
+    def delete(self, query):
+        return
 
 class VirtuosoBackend(Backend):
 
@@ -36,38 +44,35 @@ class VirtuosoBackend(Backend):
 
         return results
 
-    def insert (self, query): return
 
-    def update (self, query): return
+class FourstoreSparqlBackend(Backend):
 
-    def delete (self, query): return
-
-class FourstoreSparqlBackend (Backend):
-
-    def __init__ (self, address):
+    def __init__(self, address):
     
         self.address = address + "/update/"
-        
         self.endpoint = SPARQLWrapper(address+"/sparql/")
         
-        #self.conn = urlopen (addr)#HTTPConnection(self.address)
-        
-    def __del__ (self):
-    
-        pass#self.conn.close()
-    
-    # выполняет запрос, возвращает результат в виде почти прямого 
-    # переноса XML/RDF на списки и объекты в Python
-    def query (self, query):
+    # выполняет запрос, возвращает результат в виде почти прямого
+    # переноса XML/RDF на списки и словари в Python
+    def query(self, query):
 
         super(FourstoreSparqlBackend, self).query(query)
 
         self.endpoint.setQuery(query)
-
         self.endpoint.setReturnFormat(JSON)
         results = self.endpoint.query().convert()
 
         return results
+
+    def ask(self, query):
+
+        super(FourstoreSparqlBackend, self).ask(query)
+
+        self.endpoint.setQuery(query)
+        self.endpoint.setReturnFormat(JSON)
+        results = self.endpoint.query().convert()
+
+        return results["boolean"]
         
     def insert (self, query):
 
@@ -88,7 +93,7 @@ class FourstoreSparqlBackend (Backend):
 
         super(FourstoreSparqlBackend, self).delete (query)
     
-        values = {"update": q}
+        values = {"update": query}
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         
         try: res = urlopen (self.address, urlencode (values))

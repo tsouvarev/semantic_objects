@@ -1,14 +1,47 @@
 #! /bin/python
 # -*- coding: utf-8 -*-
+from pprint import pprint, pformat
+from rdflib.term import XSDToPython
 
-def print_results (results):
 
-    #print results
+def get_results(results, for_html = False, do_print=False):
 
-    for result in results["results"]["bindings"]:
+    res = ""
 
-        for i in results["head"]["vars"]: print "%s: %s" % (i, result[i]["value"])
-        print
+    if for_html:
+        res += "<pre>"
+
+    res += pformat(results)
+
+    if for_html:
+        res += "</pre>"
+    return res
+
+def multi_convert(results, schemas):
+
+    mappings = dict((unicode(from_type), to_type if to_type is not None else lambda x: x)
+                    for from_type, to_type in XSDToPython.items())
+    res = []
+
+    for prop in results["results"]["bindings"]:
+
+        c = {}
+        for i, in schemas:
+
+            p = prop[i]
+
+            if "type" in p and p["type"] != "bnode":
+
+                if "datatype" in p and  p["datatype"] in mappings:
+                    p = mappings[p["datatype"]](p["value"])
+                else:
+                    p = p["value"]
+
+                c[i] = p
+
+        res.append(c)
+
+    return res
 
 # конвертация результатов от get_query в более удобный вид (description is obsoleted)
 # properties - результаты от get_query
@@ -28,17 +61,19 @@ def print_results (results):
 # записать его в итоговый объект как атрибут "a"
 # кортеж ("a", ["b","c"]) означает взять из properties все свойства под названиями "b" и "c" и
 # записать их в один список под названием "a"
-def convert (properties, schemas, split = False, create = False):
+def convert(properties, schemas, split = False, create = False):
 
+    res = []
     c = {}
     
     for schema in schemas:
-    
-        if len (schema) == 1:
+
+        if len(schema) == 1:
     
             i, = schema
-    
+
             for prop in properties["results"]["bindings"]:
+
 
                 p = prop[i]
 
@@ -49,6 +84,8 @@ def convert (properties, schemas, split = False, create = False):
                     p = p["value"]
                 
                     c[i] = p
+
+            res.append(c)
     
         else:
     
