@@ -133,15 +133,17 @@ class RDFSQueries(object):
         return [x["value"]["value"] for x in results]
 
     @normalize_uri
-    def get_objects_by_attr_value(self, **kwargs):
+    def get_objects_by_attr_value(self, class_uri, **kwargs):
 
         q = """
                 select *
                 where
                 {
+                    ?obj a %(class_uri)s .
                     %(propeties)s
                 }
             """ % {
+            "class_uri": class_uri,
             "propeties": ". \n".join("?obj %s %s" % (k, v) for (k, v) in kwargs.iteritems()),
         }
 

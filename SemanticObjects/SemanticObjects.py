@@ -12,12 +12,16 @@ class Thing(object):
     @classmethod
     def get_objects(cls):
 
-        resources = cls.query.all_resources(cls.uri)
-        return [cls(x) for x in resources]
+        objects = cls.query.all_resources(cls.uri)
+        return [cls(x) for x in objects]
 
-    def filter(self, **kwargs):
-        objects = self.query.get_objects_by_attr_value(**kwargs)
-        return objects
+    @classmethod
+    def filter(cls, **kwargs):
+        objects = cls.query.get_objects_by_attr_value(cls.uri, **kwargs)
+        return [cls(x) for x in objects]
+
+    def __repr__(self):
+        return split_uri(self.uri)[1]
 
     def __getattr__(self, item):
 
