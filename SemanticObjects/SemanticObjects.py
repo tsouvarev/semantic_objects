@@ -1,93 +1,75 @@
 # -*- coding: utf-8 -*-
 
-import SPARQLWrapper as wrap
-from rdflib import URIRef
-from DBBackends import FourstoreSparqlBackend
-from Connection import Connection
-from QueryResultParser import convert
-from rdflib.namespace import Namespace, split_uri, OWL, RDF, RDFS
-from Queries import RDFSQueries
-
-class PropertyResolver(object):
-
-    def __init__(self, conn, queries, prop_uri, resource_uri, class_uri):
-        self.uri = prop_uri
-        self.resource_uri = resource_uri
-        self.class_uri = class_uri
-        self.conn = conn
-        self.queries = queries
-
-    def __get__(self, obj, type=None):
-        print 111111
-        q = self.queries.get_property_value(self.uri, obj.uri)
-        return convert(self.conn.query(q), (("value", ["val"]), ))["value"]
-
-    def __set__(self, obj, value):
-        pass
-
-    def __delete__(self, obj):
-        pass
+from rdflib.namespace import OWL, RDF, RDFS, split_uri
+from RDFSQueries import RDFSQueries
 
 
 class Thing(object):
 
-    def __init__(self, resource_uri):
-        self.uri = resource_uri
-        self.parent_class_loaded = False
-        self.properties_loaded = False
-        self.conn = self.__class__.conn
-
-        q = self.queries.get_available_properties(self.__class__.uri)
-        properties = convert(self.conn.query(q), (("prop", ["prop"]),))["prop"]
-
-        for prop in properties:
-            namespace, name = split_uri(prop)
-            setattr(self, name, None)
-
-#    def __getattribute__(self, item):
-#
-#        q = self.queries.get_property_value(item)
-#        return convert(self.conn.query(q), (("value", ["val"]), ))["value"]
-
-    def __get_property_value(self, resource_uri, prop_uri):
-        q = self.queries.get_property_value(prop_uri, resource_uri)
-        return convert(self.conn.query(q), (("value", ["val"]), ))["value"][0]
-
+    def __init__(self, uri):
+        self.uri = uri
 
     @classmethod
-    def all(cls):
-        q = cls.queries.get_resources(cls.uri)
+    def get_objects(cls):
 
-        return [cls(uri)
-                for uri in convert(cls.conn.query(q), (("resources", ["cl"]),))["resources"]]
+        resources = cls.query.all_resources(cls.uri)
+        return [cls(x) for x in resources]
 
-class RDFSClass(object):
+    def filter(self, **kwargs):
+        objects = self.query.get_objects_by_attr_value(**kwargs)
+        return objects
 
-    def __init__(self, connection, lang = None):
+    def __getattr__(self, item):
 
-        # запоминаем SPARQL-endpoint
-        self.conn = connection
-        if lang is not None:
-            self.queries = {"rdfs": RDFSQueries}[lang]
-        else:
-            self.queries = None
+        if not self.query.has_attr(self.uri, item):
+            raise AttributeError("Object '%s' has no attribute '%s'" % (self.uri, item))
 
-
-        # список базовых классов, понадобится при запросах классов и ресурсов из хранилища
-        # также играет роль кэша классов
-        self.classes = {}
-        self.superclasses = {}
+        return self.query.get_attr(self.uri, item)
 
 
-    def get(self, uri):
-        namespace, name = split_uri(uri)
-        q = self.queries.is_class(uri)
-        is_class = self.conn.ask(q)
+class Factory(object):
 
-        if is_class:
-            return type(str(name), (Thing,), {"uri": uri, "conn": self.conn, "queries": self.queries})
-        else:
-            raise Exception("URI not for class")
+    def __init__(self, connection, language="RDFS"):
 
+        self.prefixes = {
+            "owl": OWL,
+            "rdf": RDF,
+            "rdfs": RDFS,
+        }
 
+        if language == "RDFS":
+            self.query = RDFSQueries(connection, self.prefixes)
 
+    def all(self):
+        return self.query.all()
+
+    def add_namespace(self, **kwargs):
+
+        for k, v in kwargs.iteritems():
+            self.prefixes[k] = v.rstrip("#") + "#"
+
+    def get_class(self, class_uri):
+
+        if self.query.is_class(class_uri):
+            properties = self.query.available_properties(class_uri)
+
+            namespace, classname = split_uri(unicode(class_uri))
+
+            kwargs = {
+                "uri": class_uri,
+                "query": self.query,
+                "properties": properties,
+                "prefixes": self.prefixes,
+            }
+
+            print "properties", properties
+
+            # for prop in properties:
+            #     # namespace, prop = split_uri(unicode(prop))
+            #     kwargs[prop] = None
+
+            cl = type(str(classname), (Thing,), kwargs)
+
+            return cl
+
+        return None
