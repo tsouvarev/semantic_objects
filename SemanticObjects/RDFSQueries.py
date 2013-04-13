@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from SPARQLWrapper.SPARQLExceptions import QueryBadFormed
 
 
 def normalize_uri(f):
@@ -23,6 +24,17 @@ def normalize_uri(f):
     return inner
 
 
+def stable(default=None):
+    def outer(f):
+        def inner(*args, **kwargs):
+            try:
+                return f(*args, **kwargs)
+            except QueryBadFormed:
+                return default
+        return inner
+    return outer
+
+
 class RDFSQueries(object):
 
     def __init__(self, connection, prefixes):
@@ -32,6 +44,7 @@ class RDFSQueries(object):
     def query(self, q):
         return self.connection.query("\n".join("prefix %s: <%s>" % (k, v) for (k, v) in self.prefixes.iteritems())+q)
 
+    @stable()
     def all(self):
 
         q = """
@@ -45,6 +58,7 @@ class RDFSQueries(object):
         results = self.query(q)["results"]["bindings"]
         return [(x["s"]["value"], x["p"]["value"], x["o"]["value"]) for x in results]
 
+    @stable()
     @normalize_uri
     def is_class(self, uri):
 
@@ -60,7 +74,7 @@ class RDFSQueries(object):
 
         return self.query(q)["boolean"]
 
-
+    @stable()
     @normalize_uri
     def has_attr(self, object_uri, attr_uri):
 
@@ -77,25 +91,25 @@ class RDFSQueries(object):
 
         return self.query(q)["boolean"]
 
-
+    @stable([])
     @normalize_uri
-    def available_properties(self, uri):
+    def available_properties(self, class_uri):
 
         q = """
                 select *
                 where
                 {
-                    ?prop rdfs:domain %(parent)s
+                    ?prop rdfs:domain %(class_uri)s
                 }
             """ % {
-            "parent": uri,
+            "class_uri": class_uri,
         }
 
         results = self.query(q)["results"]["bindings"]
 
         return [x["prop"]["value"] for x in results]
 
-
+    @stable([])
     @normalize_uri
     def all_resources(self, class_uri):
 
@@ -113,7 +127,7 @@ class RDFSQueries(object):
 
         return [x["cl"]["value"] for x in results]
 
-
+    @stable()
     @normalize_uri
     def get_attr(self, object_uri, attr_uri):
 
@@ -132,6 +146,7 @@ class RDFSQueries(object):
 
         return [x["value"]["value"] for x in results]
 
+    @stable([])
     @normalize_uri
     def get_objects_by_attr_value(self, class_uri, **kwargs):
 
@@ -139,15 +154,13 @@ class RDFSQueries(object):
                 select *
                 where
                 {
-                    ?obj a %(class_uri)s .
+                    ?obj a %(class_uri)s ,
                     %(propeties)s
                 }
             """ % {
             "class_uri": class_uri,
-            "propeties": ". \n".join("?obj %s %s" % (k, v) for (k, v) in kwargs.iteritems()),
+            "propeties": ",\n".join("%s %s" % (k, v) for (k, v) in kwargs.iteritems()),
         }
-
-        print q
 
         results = self.query(q)["results"]["bindings"]
 

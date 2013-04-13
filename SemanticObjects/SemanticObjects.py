@@ -16,7 +16,11 @@ class Thing(object):
         return [cls(x) for x in objects]
 
     @classmethod
-    def filter(cls, **kwargs):
+    def filter(cls, *args, **kwargs):
+        if args:
+            assert isinstance(args[0], dict)
+            kwargs.update(args[0])
+
         objects = cls.query.get_objects_by_attr_value(cls.uri, **kwargs)
         return [cls(x) for x in objects]
 
