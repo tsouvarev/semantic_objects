@@ -154,7 +154,7 @@ class RDFSQueries(object):
                 select *
                 where
                 {
-                    ?obj a %(class_uri)s ,
+                    ?obj a %(class_uri)s ;
                     %(propeties)s
                 }
             """ % {

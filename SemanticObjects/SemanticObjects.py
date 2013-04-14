@@ -70,12 +70,6 @@ class Factory(object):
                 "prefixes": self.prefixes,
             }
 
-            print "properties", properties
-
-            # for prop in properties:
-            #     # namespace, prop = split_uri(unicode(prop))
-            #     kwargs[prop] = None
-
             cl = type(str(classname), (Thing,), kwargs)
 
             return cl
