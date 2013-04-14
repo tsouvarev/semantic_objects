@@ -7,7 +7,7 @@ from RDFSQueries import RDFSQueries
 class Thing(object):
 
     def __init__(self, uri):
-        self.uri = uri
+        self.uri = unicode(uri)
 
     @classmethod
     def get_objects(cls):
