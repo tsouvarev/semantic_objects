@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from SPARQLWrapper.SPARQLExceptions import QueryBadFormed
+from rdflib import URIRef
 
 
 def default_to(default=None):
@@ -49,8 +50,6 @@ class RDFSQueries(object):
             "uri": uri,
         }
 
-        print q
-
         return self.query(q)["boolean"]
 
     @default_to(None)
@@ -99,7 +98,7 @@ class RDFSQueries(object):
 
         results = self.query(q)["results"]["bindings"]
 
-        return [x["prop"]["value"] for x in results]
+        return [URIRef(x["prop"]["value"]) for x in results]
 
     @default_to([])
     def available_object_properties(self, object_uri):
@@ -116,7 +115,7 @@ class RDFSQueries(object):
 
         results = self.query(q)["results"]["bindings"]
 
-        return [x["prop"]["value"] for x in results]
+        return [URIRef(x["prop"]["value"]) for x in results]
 
     @default_to([])
     def all_resources(self, class_uri):
@@ -133,7 +132,7 @@ class RDFSQueries(object):
 
         results = self.query(q)["results"]["bindings"]
 
-        return [x["obj_uri"]["value"] for x in results]
+        return [URIRef(x["obj_uri"]["value"]) for x in results]
 
     @default_to(None)
     def get_attr(self, object_uri, attr_uri):
@@ -151,7 +150,7 @@ class RDFSQueries(object):
 
         results = self.query(q)["results"]["bindings"]
 
-        return [x["value"]["value"] for x in results]
+        return [x["value"] for x in results]
 
     @default_to([])
     def get_objects_by_attr_value(self, class_uri, **kwargs):
@@ -170,7 +169,7 @@ class RDFSQueries(object):
 
         results = self.query(q)["results"]["bindings"]
 
-        return [x["obj"]["value"] for x in results]
+        return [URIRef(x["obj"]["value"]) for x in results]
 
     @default_to(None)
     def get_parent_class(self, object_uri):
@@ -187,7 +186,7 @@ class RDFSQueries(object):
 
         results = self.query(q)["results"]["bindings"]
 
-        return [x["class_uri"]["value"] for x in results][0]
+        return [URIRef(x["class_uri"]["value"]) for x in results][0]
 
     @default_to([])
     def get_base_classes(self, class_uri):
@@ -203,4 +202,4 @@ class RDFSQueries(object):
 
         results = self.query(q)["results"]["bindings"]
 
-        return [x["class_uri"]["value"] for x in results]
+        return [URIRef(x["class_uri"]["value"]) for x in results]

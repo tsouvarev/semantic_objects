@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from rdflib import Literal
 
 from rdflib.namespace import OWL, RDF, RDFS, split_uri
 from RDFSQueries import RDFSQueries
+from one.SemanticObjects.utils import memoize
 
 
 class Thing(object):
@@ -12,7 +14,7 @@ class Thing(object):
     @classmethod
     def get_objects(cls):
 
-        objects = cls.query.all_resources(cls.uri)
+        objects = cls.factory.query.all_resources(cls.uri)
         return [cls(x) for x in objects]
 
     @classmethod
@@ -21,7 +23,7 @@ class Thing(object):
             assert isinstance(args[0], dict)
             kwargs.update(args[0])
 
-        objects = cls.query.get_objects_by_attr_value(cls.uri, **kwargs)
+        objects = cls.factory.query.get_objects_by_attr_value(cls.uri, **kwargs)
         return [cls(x) for x in objects]
 
     def __repr__(self):
@@ -29,10 +31,16 @@ class Thing(object):
 
     def __getattr__(self, item):
 
-        if not self.query.has_attr(self.uri, item):
+        if not self.factory.query.has_attr(self.uri, item):
             raise AttributeError("Object '%s' has no attribute '%s'" % (self.uri, item))
 
-        return self.query.get_attr(self.uri, item)
+        results = self.factory.query.get_attr(self.uri, item)
+
+        for x in results:
+            if x["type"] == "uri":
+                return self.factory.get_object(x["value"])
+
+            return Literal(x["value"], datatype=x["datatype"]).toPython()
 
 
 class Factory(object):
@@ -56,6 +64,7 @@ class Factory(object):
         for k, v in kwargs.iteritems():
             self.prefixes[k] = v.rstrip("#") + "#"
 
+    @memoize
     def get_class(self, class_uri, check_class=True):
 
         if not check_class or self.query.is_class(class_uri):
@@ -72,9 +81,8 @@ class Factory(object):
 
             kwargs = {
                 "uri": class_uri,
-                "query": self.query,
+                "factory": self,
                 "properties": properties,
-                "prefixes": self.prefixes,
             }
 
             cl = type(str(classname), tuple(base_classes), kwargs)
