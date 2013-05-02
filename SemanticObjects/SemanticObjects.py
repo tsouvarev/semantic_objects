@@ -56,10 +56,17 @@ class Factory(object):
         for k, v in kwargs.iteritems():
             self.prefixes[k] = v.rstrip("#") + "#"
 
-    def get_class(self, class_uri):
+    def get_class(self, class_uri, check_class=True):
 
-        if self.query.is_class(class_uri):
-            properties = self.query.available_properties(class_uri)
+        if not check_class or self.query.is_class(class_uri):
+
+            base_class_uris = self.query.get_base_classes(class_uri)
+            if base_class_uris:
+                base_classes = [self.get_class(cl, check_class=False) for cl in base_class_uris]
+            else:
+                base_classes = [Thing]
+
+            properties = self.query.available_class_properties(class_uri)
 
             namespace, classname = split_uri(unicode(class_uri))
 
@@ -70,8 +77,20 @@ class Factory(object):
                 "prefixes": self.prefixes,
             }
 
-            cl = type(str(classname), (Thing,), kwargs)
+            cl = type(str(classname), tuple(base_classes), kwargs)
 
             return cl
 
         return None
+
+    def get_object(self, obj_uri):
+
+        if self.query.is_object(obj_uri):
+            cl = self.get_class(self.query.get_parent_class(obj_uri))
+
+            obj = cl(obj_uri)
+            obj.properties = self.query.available_object_properties(obj_uri)
+
+            return obj
+        return None
+

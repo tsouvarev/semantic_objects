@@ -1,19 +1,18 @@
 #! /bin/python
 # -*- coding: utf-8 -*-
 from pprint import pformat
+from django.utils.html import escape
 from rdflib.term import XSDToPython
 
 
 def get_results(results, for_html=False, do_print=False):
     res = ""
 
-    if for_html:
-        res += "<pre>"
-
     res += pformat(results)
 
     if for_html:
-        res += "</pre>"
+        res = "<pre>" + escape(res) + "</pre>"
+
     return res
 
 

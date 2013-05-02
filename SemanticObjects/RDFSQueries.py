@@ -2,29 +2,7 @@
 from SPARQLWrapper.SPARQLExceptions import QueryBadFormed
 
 
-def normalize_uri(f):
-
-    def inner(self, *args, **kwargs):
-        newargs = []
-        for uri in args:
-            if uri.find("#") > 0:  # full name
-                newargs.append("<%s>" % uri)
-            else:
-                newargs.append(uri)
-
-        newkwargs = {}
-        for key, uri in kwargs.iteritems():
-            if uri.find("#") > 0:  # full name
-                newkwargs[key] = "<%s>" % uri
-            else:
-                newkwargs[key] = uri
-
-        return f(self, *newargs, **newkwargs)
-
-    return inner
-
-
-def stable(default=None):
+def default_to(default=None):
     def outer(f):
         def inner(*args, **kwargs):
             try:
@@ -44,7 +22,7 @@ class RDFSQueries(object):
     def query(self, q):
         return self.connection.query("\n".join("prefix %s: <%s>" % (k, v) for (k, v) in self.prefixes.iteritems())+q)
 
-    @stable()
+    @default_to(None)
     def all(self):
 
         q = """
@@ -58,15 +36,31 @@ class RDFSQueries(object):
         results = self.query(q)["results"]["bindings"]
         return [(x["s"]["value"], x["p"]["value"], x["o"]["value"]) for x in results]
 
-    @stable()
-    @normalize_uri
+    @default_to(None)
     def is_class(self, uri):
 
         q = """
                 ask
                 where
                 {
-                    %(uri)s a rdfs:Class
+                    <%(uri)s> a rdfs:Class
+                }
+            """ % {
+            "uri": uri,
+        }
+
+        print q
+
+        return self.query(q)["boolean"]
+
+    @default_to(None)
+    def is_object(self, uri):
+
+        q = """
+                ask
+                where
+                {
+                    <%(uri)s> a ?tmp
                 }
             """ % {
             "uri": uri,
@@ -74,15 +68,14 @@ class RDFSQueries(object):
 
         return self.query(q)["boolean"]
 
-    @stable()
-    @normalize_uri
+    @default_to(None)
     def has_attr(self, object_uri, attr_uri):
 
         q = """
                 ask
                 where
                 {
-                    %(object_uri)s %(attr_uri)s ?val
+                    <%(object_uri)s> <%(attr_uri)s> ?val
                 }
             """ % {
             "object_uri": object_uri,
@@ -91,15 +84,14 @@ class RDFSQueries(object):
 
         return self.query(q)["boolean"]
 
-    @stable([])
-    @normalize_uri
-    def available_properties(self, class_uri):
+    @default_to([])
+    def available_class_properties(self, class_uri):
 
         q = """
                 select *
                 where
                 {
-                    ?prop rdfs:domain %(class_uri)s
+                    ?prop rdfs:domain <%(class_uri)s>
                 }
             """ % {
             "class_uri": class_uri,
@@ -109,15 +101,31 @@ class RDFSQueries(object):
 
         return [x["prop"]["value"] for x in results]
 
-    @stable([])
-    @normalize_uri
+    @default_to([])
+    def available_object_properties(self, object_uri):
+
+        q = """
+                select *
+                where
+                {
+                    <%(object_uri)s> ?prop ?tmp
+                }
+            """ % {
+            "object_uri": object_uri,
+        }
+
+        results = self.query(q)["results"]["bindings"]
+
+        return [x["prop"]["value"] for x in results]
+
+    @default_to([])
     def all_resources(self, class_uri):
 
         q = """
                 select *
                 where
                 {
-                    ?cl a %(type)s
+                    ?obj_uri a <%(type)s>
                 }
             """ % {
             "type": class_uri,
@@ -125,17 +133,16 @@ class RDFSQueries(object):
 
         results = self.query(q)["results"]["bindings"]
 
-        return [x["cl"]["value"] for x in results]
+        return [x["obj_uri"]["value"] for x in results]
 
-    @stable()
-    @normalize_uri
+    @default_to(None)
     def get_attr(self, object_uri, attr_uri):
 
         q = """
                 select *
                 where
                 {
-                    %(object_uri)s %(attr_uri)s ?value
+                    <%(object_uri)s> <%(attr_uri)s> ?value
                 }
             """ % {
             "object_uri": object_uri,
@@ -146,22 +153,54 @@ class RDFSQueries(object):
 
         return [x["value"]["value"] for x in results]
 
-    @stable([])
-    @normalize_uri
+    @default_to([])
     def get_objects_by_attr_value(self, class_uri, **kwargs):
 
         q = """
                 select *
                 where
                 {
-                    ?obj a %(class_uri)s ;
+                    ?obj a <%(class_uri)s> ;
                     %(propeties)s
                 }
             """ % {
             "class_uri": class_uri,
-            "propeties": ",\n".join("%s %s" % (k, v) for (k, v) in kwargs.iteritems()),
+            "propeties": ";\n".join("<%s> <%s>" % (k, v) for (k, v) in kwargs.iteritems()),
         }
 
         results = self.query(q)["results"]["bindings"]
 
         return [x["obj"]["value"] for x in results]
+
+    @default_to(None)
+    def get_parent_class(self, object_uri):
+
+        q = """
+                select ?class_uri
+                where
+                {
+                    <%(object_uri)s> a ?class_uri
+                }
+            """ % {
+            "object_uri": object_uri,
+        }
+
+        results = self.query(q)["results"]["bindings"]
+
+        return [x["class_uri"]["value"] for x in results][0]
+
+    @default_to([])
+    def get_base_classes(self, class_uri):
+        q = """
+                select ?class_uri
+                where
+                {
+                    <%(class_uri)s> rdfs:subClassOf ?class_uri
+                }
+            """ % {
+            "class_uri": class_uri,
+        }
+
+        results = self.query(q)["results"]["bindings"]
+
+        return [x["class_uri"]["value"] for x in results]

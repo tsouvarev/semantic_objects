@@ -6,7 +6,7 @@ from DBBackends import *
 class Connection():
     def __init__(self, backend):
         if not isinstance(backend, Backend):
-            raise Exception("Given wrong backend for connection: %s" % backend)
+            raise Exception("Given wrong backend for connection: '%s'" % backend)
 
         self.db = backend
 
