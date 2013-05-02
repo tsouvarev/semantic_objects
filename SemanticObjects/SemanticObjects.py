@@ -97,6 +97,7 @@ class Factory(object):
 
         return None
 
+    @memoize
     def get_object(self, obj_uri):
 
         if self.query.is_object(obj_uri):
