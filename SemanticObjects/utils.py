@@ -11,9 +11,6 @@ def memoize(f):
 
         if key not in cache:
             cache[key] = f(*args, **kwargs)
-            print "new cache", key
-        else:
-            print "from cache", key
 
         return cache[key]
 

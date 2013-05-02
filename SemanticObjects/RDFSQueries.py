@@ -153,7 +153,7 @@ class RDFSQueries(object):
         return [x["value"] for x in results]
 
     @default_to([])
-    def get_objects_by_attr_value(self, class_uri, **kwargs):
+    def get_class_objects_by_attr_value(self, class_uri, **kwargs):
 
         q = """
                 select *
@@ -170,6 +170,24 @@ class RDFSQueries(object):
         results = self.query(q)["results"]["bindings"]
 
         return [URIRef(x["obj"]["value"]) for x in results]
+
+    @default_to([])
+    def get_subclasses_of_class(self, class_uri):
+
+        q = """
+                select *
+                where
+                {
+                    ?subcl a rdfs:Class ;
+                    rdfs:subClassOf <%(class_uri)s>
+                }
+            """ % {
+            "class_uri": class_uri,
+        }
+
+        results = self.query(q)["results"]["bindings"]
+
+        return [URIRef(x["subcl"]["value"]) for x in results]
 
     @default_to(None)
     def get_parent_class(self, object_uri):

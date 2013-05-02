@@ -23,8 +23,14 @@ class Thing(object):
             assert isinstance(args[0], dict)
             kwargs.update(args[0])
 
-        objects = cls.factory.query.get_objects_by_attr_value(cls.uri, **kwargs)
+        objects = cls.factory.query.get_class_objects_by_attr_value(cls.uri, **kwargs)
         return [cls(x) for x in objects]
+
+    @classmethod
+    def get_subclasses(cls):
+        results = cls.factory.query.get_subclasses_of_class(cls.uri)
+
+        return [cls.factory.get_class(x) for x in results]
 
     def __repr__(self):
         return split_uri(self.uri)[1]
@@ -65,13 +71,13 @@ class Factory(object):
             self.prefixes[k] = v.rstrip("#") + "#"
 
     @memoize
-    def get_class(self, class_uri, check_class=True):
+    def get_class(self, class_uri):
 
-        if not check_class or self.query.is_class(class_uri):
+        if self.query.is_class(class_uri):
 
             base_class_uris = self.query.get_base_classes(class_uri)
             if base_class_uris:
-                base_classes = [self.get_class(cl, check_class=False) for cl in base_class_uris]
+                base_classes = [self.get_class(cl) for cl in base_class_uris]
             else:
                 base_classes = [Thing]
 
