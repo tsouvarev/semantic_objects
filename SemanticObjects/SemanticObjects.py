@@ -41,12 +41,25 @@ class Thing(object):
             raise AttributeError("Object '%s' has no attribute '%s'" % (self.uri, item))
 
         results = self.factory.query.get_attr(self.uri, item)
+        container = {
+            "uri": [],
+            "literal": {}
+        }
 
         for x in results:
             if x["type"] == "uri":
-                return self.factory.get_object(x["value"])
 
-            return Literal(x["value"], datatype=x["datatype"]).toPython()
+                obj = self.factory.get_object(x["value"])
+                container["uri"].append(obj)
+            elif x["type"] in ["literal", "literal-typed"]:
+                lang = x.get("xml:lang")
+                val = Literal(x["value"], datatype=x.get("datatype"), lang=lang).toPython()
+                container["literal"][lang if lang is not None else "en"] = val
+
+        if container["uri"]:
+            return container["uri"][0] if len(container["uri"]) == 1 else container["uri"]
+        elif container["literal"]:
+            return container["literal"]
 
 
 class Factory(object):
@@ -101,7 +114,8 @@ class Factory(object):
     def get_object(self, obj_uri):
 
         if self.query.is_object(obj_uri):
-            cl = self.get_class(self.query.get_parent_class(obj_uri))
+            parent_class = self.query.get_parent_class(obj_uri)
+            cl = self.get_class(parent_class)
 
             obj = cl(obj_uri)
             obj.properties = self.query.available_object_properties(obj_uri)

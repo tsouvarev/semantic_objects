@@ -1,7 +1,7 @@
 #! /bin/python
 # -*- coding: utf-8 -*-
 
-from SPARQLWrapper import SPARQLWrapper, JSON, RDF, XML, TURTLE, N3
+from SPARQLWrapper import SPARQLWrapper, JSON
 from urllib2 import urlopen, URLError
 from urllib import urlencode
 
@@ -25,6 +25,7 @@ class Backend(object):
 
 
 class AllegroBackend(Backend):
+
     def __init__(self, address):
         self.endpoint = SPARQLWrapper(address)
 
@@ -43,8 +44,6 @@ class VirtuosoBackend(Backend):
         self.endpoint = SPARQLWrapper(address + "/sparql/")
 
     def query(self, query):
-        super(VirtuosoBackend, self).query(query)
-
         self.endpoint.setQuery(query)
 
         self.endpoint.setReturnFormat(JSON)
@@ -63,8 +62,6 @@ class FourstoreSparqlBackend(Backend):
     # переноса XML/RDF на списки и словари в Python
     def query(self, query):
 
-        super(FourstoreSparqlBackend, self).query(query)
-
         self.endpoint.setQuery(query)
         self.endpoint.setReturnFormat(JSON)
         results = self.endpoint.query().convert()
@@ -73,8 +70,6 @@ class FourstoreSparqlBackend(Backend):
 
     def ask(self, query):
 
-        super(FourstoreSparqlBackend, self).ask(query)
-
         self.endpoint.setQuery(query)
         self.endpoint.setReturnFormat(JSON)
         results = self.endpoint.query().convert()
@@ -82,8 +77,6 @@ class FourstoreSparqlBackend(Backend):
         return results["boolean"]
 
     def insert(self, query):
-
-        super(FourstoreSparqlBackend, self).insert(query)
 
         values = {"update": q}
 
@@ -95,8 +88,6 @@ class FourstoreSparqlBackend(Backend):
             return res.read()
 
     def delete(self, query):
-
-        super(FourstoreSparqlBackend, self).delete(query)
 
         values = {"update": query}
 

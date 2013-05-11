@@ -59,13 +59,13 @@ class RDFSQueries(object):
                 ask
                 where
                 {
-                    <%(uri)s> a ?tmp
+                    <%(uri)s> a rdfs:Class
                 }
             """ % {
             "uri": uri,
         }
 
-        return self.query(q)["boolean"]
+        return not self.query(q)["boolean"]
 
     @default_to(None)
     def has_attr(self, object_uri, attr_uri):
