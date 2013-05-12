@@ -23,6 +23,9 @@ class RDFSQueries(object):
     def query(self, q):
         return self.connection.query("\n".join("prefix %s: <%s>" % (k, v) for (k, v) in self.prefixes.iteritems())+q)
 
+    def insert(self, q):
+        return self.connection.insert("\n".join("prefix %s: <%s>" % (k, v) for (k, v) in self.prefixes.iteritems())+q)
+
     @default_to(None)
     def all(self):
 
@@ -55,17 +58,22 @@ class RDFSQueries(object):
     @default_to(None)
     def is_object(self, uri):
 
+        return not self.is_class(uri)
+
+    @default_to(None)
+    def exists(self, uri):
+
         q = """
                 ask
                 where
                 {
-                    <%(uri)s> a rdfs:Class
+                    <%(uri)s> ?p ?o
                 }
             """ % {
             "uri": uri,
         }
 
-        return not self.query(q)["boolean"]
+        return self.query(q)["boolean"]
 
     @default_to(None)
     def has_attr(self, object_uri, attr_uri):
@@ -221,3 +229,43 @@ class RDFSQueries(object):
         results = self.query(q)["results"]["bindings"]
 
         return [URIRef(x["class_uri"]["value"]) for x in results]
+
+    @default_to(None)
+    def insert_data(self, data):
+        q = """
+                insert data
+                {
+                    %(data)s
+                }
+            """ % {
+            "data": ["<%s> <%s> <%s> ." % triplet for triplet in data]
+        }
+
+        return self.insert(q)["boolean"]
+
+    @default_to(None)
+    def create_object(self, object_uri, class_uri):
+        q = """
+                insert data
+                {
+                    <%(object_uri)s> a <%(class_uri)s>
+                }
+            """ % {
+            "object_uri": object_uri,
+            "class_uri": class_uri,
+        }
+
+        return self.insert(q)["boolean"]
+
+    @default_to(None)
+    def create_class(self, class_uri):
+        q = """
+                insert data
+                {
+                    <%(class_uri)s> a <rdfs:Class>
+                }
+            """ % {
+            "class_uri": class_uri,
+        }
+
+        return self.insert(q)["boolean"]

@@ -1,7 +1,7 @@
 #! /bin/python
 # -*- coding: utf-8 -*-
 
-from SPARQLWrapper import SPARQLWrapper, JSON
+from SPARQLWrapper import SPARQLWrapper, JSON, POST, SELECT
 from urllib2 import urlopen, URLError
 from urllib import urlencode
 
@@ -32,8 +32,17 @@ class AllegroBackend(Backend):
     def query(self, query):
 
         self.endpoint.setQuery(query)
-
         self.endpoint.setReturnFormat(JSON)
+        results = self.endpoint.query().convert()
+
+        return results
+
+    def insert(self, query):
+
+        self.endpoint.setQuery(query)
+        self.endpoint.setMethod(POST)
+        self.endpoint.setReturnFormat(JSON)
+        self.endpoint.queryType = SELECT
         results = self.endpoint.query().convert()
 
         return results

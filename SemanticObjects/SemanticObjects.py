@@ -9,6 +9,10 @@ from one.SemanticObjects.utils import memoize
 class Thing(object):
 
     def __init__(self, uri):
+        if not self.factory.query.exists(uri):
+            if not self.factory.query.create_object(uri, self.__class__.uri):
+                raise Exception("Could not create such object")
+
         self.uri = unicode(uri)
 
     @classmethod
@@ -38,7 +42,8 @@ class Thing(object):
     def __getattr__(self, item):
 
         if not self.factory.query.has_attr(self.uri, item):
-            raise AttributeError("Object '%s' has no attribute '%s'" % (self.uri, item))
+            # raise AttributeError("Object '%s' has no attribute '%s'" % (self.uri, item))
+            return None
 
         results = self.factory.query.get_attr(self.uri, item)
         container = {
@@ -107,8 +112,12 @@ class Factory(object):
             cl = type(str(classname), tuple(base_classes), kwargs)
 
             return cl
-
-        return None
+        # нет такого класса? создадим!
+        else:
+            if self.query.create_class(class_uri):
+                return self.get_class(class_uri)
+            else:
+                return None
 
     @memoize
     def get_object(self, obj_uri):
