@@ -52,7 +52,6 @@ class RDFSQueries(object):
             """ % {
             "uri": uri,
         }
-
         return self.query(q)["boolean"]
 
     @default_to(None)
@@ -262,7 +261,7 @@ class RDFSQueries(object):
         q = """
                 insert data
                 {
-                    <%(class_uri)s> a <rdfs:Class>
+                    <%(class_uri)s> a rdfs:Class
                 }
             """ % {
             "class_uri": class_uri,
