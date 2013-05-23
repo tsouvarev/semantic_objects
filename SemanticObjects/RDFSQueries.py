@@ -52,12 +52,34 @@ class RDFSQueries(object):
             """ % {
             "uri": uri,
         }
+
+        return self.query(q)["boolean"]
+
+    @default_to(None)
+    def is_property(self, uri):
+
+        q = """
+                ask
+                where
+                {
+                    {
+                        <%(uri)s> a owl:ObjectProperty
+                    }
+                    union
+                    {
+                        <%(uri)s> a rdf:Property
+                    }
+                }
+            """ % {
+            "uri": uri,
+        }
+
         return self.query(q)["boolean"]
 
     @default_to(None)
     def is_object(self, uri):
 
-        return not self.is_class(uri)
+        return not self.is_class(uri) and not self.is_property(uri)
 
     @default_to(None)
     def exists(self, uri):
@@ -97,15 +119,15 @@ class RDFSQueries(object):
                 select *
                 where
                 {
-                    ?prop rdfs:domain <%(class_uri)s>
+                    ?prop rdfs:domain <%(class_uri)s> .
+                    <%(class_uri)s> ?prop ?val .
                 }
             """ % {
             "class_uri": class_uri,
         }
 
         results = self.query(q)["results"]["bindings"]
-
-        return [URIRef(x["prop"]["value"]) for x in results]
+        return results
 
     @default_to([])
     def available_object_properties(self, object_uri):
@@ -114,15 +136,15 @@ class RDFSQueries(object):
                 select *
                 where
                 {
-                    <%(object_uri)s> ?prop ?tmp
+                    <%(object_uri)s> ?prop ?val .
+                    FILTER(?prop != rdf:type)
                 }
             """ % {
             "object_uri": object_uri,
         }
 
         results = self.query(q)["results"]["bindings"]
-
-        return [URIRef(x["prop"]["value"]) for x in results]
+        return results
 
     @default_to([])
     def all_resources(self, class_uri):

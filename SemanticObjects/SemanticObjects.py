@@ -1,9 +1,38 @@
 # -*- coding: utf-8 -*-
-from rdflib import Literal
+from pprint import pprint
+from symbol import factor
+from rdflib import Literal, URIRef
 
 from rdflib.namespace import OWL, RDF, RDFS, split_uri
 from RDFSQueries import RDFSQueries
 from one.SemanticObjects.utils import memoize
+
+
+class Property(object):
+
+    def __init__(self, factory, property_raw):
+
+        self.name = property_raw["prop"]["value"]
+        self.value = property_raw["val"]["value"]
+        self.type = property_raw["val"]["type"]
+        self.lang = property_raw["val"].get("xml:lang")
+        self.datatype = property_raw["val"].get("datatype")
+        self.factory = factory
+
+    def to_python(self):
+
+        if self.type == "uri":
+            if self.factory.query.is_class(self.value):
+                val = self.factory.get_class(self.value)
+            elif self.factory.query.is_object(self.value):
+                val = self.factory.get_object(self.value)
+            # если не объект и не класс, то свойство
+            else:
+                val = None
+        elif self.type in ["literal", "literal-typed"]:
+            val = Literal(self.value, datatype=self.datatype, lang=self.lang).toPython()
+
+        return val
 
 
 class Thing(object):
@@ -37,7 +66,7 @@ class Thing(object):
         return [cls.factory.get_class(x) for x in results]
 
     def __repr__(self):
-        return split_uri(self.uri)[1]
+        return "object " + split_uri(self.uri)[1]
 
     def __getattr__(self, item):
 
@@ -45,26 +74,11 @@ class Thing(object):
             # raise AttributeError("Object '%s' has no attribute '%s'" % (self.uri, item))
             return None
 
-        results = self.factory.query.get_attr(self.uri, item)
-        container = {
-            "uri": [],
-            "literal": {}
-        }
+        # don't forget to call super
+        if item not in self.properties:
+            return None
 
-        for x in results:
-            if x["type"] == "uri":
-
-                obj = self.factory.get_object(x["value"])
-                container["uri"].append(obj)
-            elif x["type"] in ["literal", "literal-typed"]:
-                lang = x.get("xml:lang")
-                val = Literal(x["value"], datatype=x.get("datatype"), lang=lang).toPython()
-                container["literal"][lang if lang is not None else "en"] = val
-
-        if container["uri"]:
-            return container["uri"][0] if len(container["uri"]) == 1 else container["uri"]
-        elif container["literal"]:
-            return container["literal"]
+        return self.properties[item].to_python()
 
 
 class Factory(object):
@@ -100,13 +114,12 @@ class Factory(object):
                 base_classes = [Thing]
 
             properties = self.query.available_class_properties(class_uri)
-
             namespace, classname = split_uri(unicode(class_uri))
 
             kwargs = {
                 "uri": class_uri,
                 "factory": self,
-                "properties": properties,
+                "properties": {x["prop"]["value"]: Property(self, x) for x in properties}
             }
 
             cl = type(str(classname), tuple(base_classes), kwargs)
@@ -127,8 +140,11 @@ class Factory(object):
             cl = self.get_class(parent_class)
 
             obj = cl(obj_uri)
-            obj.properties = self.query.available_object_properties(obj_uri)
+
+            properties = self.query.available_object_properties(obj_uri)
+            obj.properties = {x["prop"]["value"]: Property(self, x) for x in properties}
 
             return obj
+
         return None
 
