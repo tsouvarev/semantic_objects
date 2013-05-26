@@ -8,7 +8,7 @@ def default_to(default=None):
         def inner(*args, **kwargs):
             try:
                 return f(*args, **kwargs)
-            except QueryBadFormed:
+            except:
                 return default
         return inner
     return outer
@@ -116,11 +116,23 @@ class RDFSQueries(object):
     def available_class_properties(self, class_uri):
 
         q = """
-                select *
+                select distinct ?prop ?prop_type ?val
                 where
                 {
-                    ?prop rdfs:domain <%(class_uri)s> .
-                    <%(class_uri)s> ?prop ?val .
+                    {
+                        ?prop rdfs:domain <%(class_uri)s> .
+                        ?prop rdfs:range ?prop_type
+                    }
+                    union
+                    {
+                        {
+                            ?prop rdfs:range ?prop_type
+                        }
+                        minus
+                        {
+                            ?prop rdfs:domain ?tmp
+                        }
+                    }
                 }
             """ % {
             "class_uri": class_uri,
@@ -133,11 +145,12 @@ class RDFSQueries(object):
     def available_object_properties(self, object_uri):
 
         q = """
-                select *
+                select distinct *
                 where
                 {
                     <%(object_uri)s> ?prop ?val .
-                    FILTER(?prop != rdf:type)
+                    filter (?prop != rdf:type) .
+                    optional {?val a ?prop_type .}
                 }
             """ % {
             "object_uri": object_uri,

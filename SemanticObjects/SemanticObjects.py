@@ -1,37 +1,36 @@
 # -*- coding: utf-8 -*-
-from collections import defaultdict
-from rdflib import Literal
+from collections import defaultdict, namedtuple
+from rdflib import Literal, URIRef
 
 from rdflib.namespace import OWL, RDF, RDFS, split_uri
 from RDFSQueries import RDFSQueries
-from one.SemanticObjects.utils import memoize
+from utils import cache, memoize
 
 
-class Property(object):
+class ClassCreator(type):
 
-    def __init__(self, factory, property_raw):
+    def __repr__(cls):
+        return "class " + split_uri(cls.uri)[1]
 
-        self.name = property_raw["prop"]["value"]
-        self.value = property_raw["val"]["value"]
-        self.type = property_raw["val"]["type"]
-        self.lang = property_raw["val"].get("xml:lang")
-        self.datatype = property_raw["val"].get("datatype")
-        self.factory = factory
+    def __new__(cls, name, bases, dict):
 
-    def to_python(self):
+        factory = dict["factory"]
+        uri = URIRef(dict["uri"])
 
-        if self.type == "uri":
-            if self.factory.query.is_class(self.value):
-                val = self.factory.get_class(self.value)
-            elif self.factory.query.is_object(self.value):
-                val = self.factory.get_object(self.value)
-            # если не объект и не класс, то свойство
-            else:
-                val = None
-        elif self.type in ["literal", "literal-typed"]:
-            val = Literal(self.value, datatype=self.datatype, lang=self.lang).toPython()
+        klass = type.__new__(cls, name, bases, dict)
 
-        return val
+        cache[uri] = klass
+
+        klass.factory = factory
+
+        p = factory.get_properties(uri, mode="class")
+
+        for property in p:
+            for x in p[property]:
+                cl = factory.get_class(URIRef(x["prop_type"]["value"]))
+                setattr(klass, URIRef(property), cl)
+
+        return klass
 
 
 class Thing(object):
@@ -67,23 +66,13 @@ class Thing(object):
     def __repr__(self):
         return "object " + split_uri(self.uri)[1]
 
-    def __getattr__(self, item):
-
-        if not self.factory.query.has_attr(self.uri, item):
-            raise KeyError(item)
-
-        if item not in self.properties:
-            raise KeyError(item)
-
-        if item == unicode(RDFS.label):
-            return {x.lang: x.to_python() for x in self.properties[item]}
-
-        return [x.to_python() for x in self.properties[item]]
-
 
 class Factory(object):
 
     def __init__(self, connection, language="RDFS"):
+
+        # so fucking bad.. or sad? well, it's too much for me to decide
+        Thing.factory = self
 
         self.prefixes = {
             "owl": OWL,
@@ -102,8 +91,25 @@ class Factory(object):
         for k, v in kwargs.iteritems():
             self.prefixes[k] = v.rstrip("#") + "#"
 
+    def get_properties(self, uri, mode):
+
+        uri = URIRef(uri)
+
+        if mode == "object":
+            raw_properties = self.query.available_object_properties(uri)
+        elif mode == "class":
+            raw_properties = self.query.available_class_properties(uri)
+
+        p = defaultdict(list)
+        for property in raw_properties:
+            p[property["prop"]["value"]].append(property)
+
+        return p
+
     @memoize
     def get_class(self, class_uri):
+
+        class_uri = URIRef(class_uri)
 
         if self.query.is_class(class_uri):
 
@@ -113,21 +119,13 @@ class Factory(object):
             else:
                 base_classes = [Thing]
 
-            properties = self.query.available_class_properties(class_uri)
-
-            p = defaultdict(list)
-            for prop in properties:
-                p[prop["prop"]["value"]].append(Property(self, prop))
-
             namespace, classname = split_uri(unicode(class_uri))
 
-            kwargs = {
-                "uri": class_uri,
-                "factory": self,
-                "properties": p,
-            }
-
-            cl = type(str(classname), tuple(base_classes), kwargs)
+            cl = ClassCreator(str(classname), tuple(base_classes),
+                              {
+                                  "uri": class_uri,
+                                  "factory": self,
+                              })
 
             return cl
         # нет такого класса? создадим!
@@ -140,18 +138,46 @@ class Factory(object):
     @memoize
     def get_object(self, obj_uri):
 
+        obj_uri = URIRef(obj_uri)
+
         if self.query.is_object(obj_uri):
             parent_class = self.query.get_parent_class(obj_uri)
-            cl = self.get_class(parent_class)
+            if parent_class is None:
+                cl = Thing
+            else:
+                cl = self.get_class(parent_class)
 
             obj = cl(obj_uri)
+            cache[obj_uri] = obj
 
-            raw_properties = self.query.available_object_properties(obj_uri)
+            raw_properties = self.get_properties(obj.uri, mode="object")
 
-            p = defaultdict(list)
-            for property in raw_properties:
-                p[property["prop"]["value"]].append(Property(self, property))
-            obj.properties = p
+            for key, values in raw_properties.items():
+                res = []
+
+                for value in values:
+                    uri = URIRef(value["val"]["value"])
+                    if value["val"]["type"] == "uri":
+                        if self.query.is_object(uri):
+                            val = self.get_object(uri)
+                        elif self.query.is_class(uri):
+                            val = self.get_class(uri)
+                    elif value["val"]["type"] == "literal":  # plain literal
+                        v = value["val"]["value"]
+                        l = value["val"].get("xml:lang", "en")
+                        val = Literal(v, lang=l)
+                    elif value["val"]["type"] == "literal-typed":  # typed literal
+                        v = value["val"]["value"]
+                        d = value["val"].get("datatype")
+                        val = Literal(v, datatype=d).toPython()
+
+                    res.append(val)
+
+                if key == unicode(RDFS.label): # all(map(lambda x: isinstance(x, Literal), res)) and all([x.language for x in res]):
+                    langs = [x.language for x in res]
+                    res = namedtuple("Label", langs)(*res)
+
+                setattr(obj, URIRef(key), res)
 
             return obj
 

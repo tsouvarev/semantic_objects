@@ -3,25 +3,27 @@
 # one ring to rule them all
 from pprint import pformat
 from django.utils.html import escape
+from rdflib.term import XSDToPython, URIRef, _XSD_PFX
 
-cache = {}
+
+cache = {} #dict(XSDToPython)
 
 
 def memoize(f):
 
-    def inner(*args, **kwargs):
+    def inner(self, uri):
 
-        key = args[1:] + tuple(kwargs.iteritems())
+        uri = URIRef(uri)
+        
+        if uri not in cache:
+            cache[uri] = f(self, uri)
 
-        if key not in cache:
-            cache[key] = f(*args, **kwargs)
-
-        return cache[key]
+        return cache[uri]
 
     return inner
 
 
-def get_results(results, for_html=False, do_print=False):
+def get_results(results, for_html=False):
     res = ""
 
     res += pformat(results)
