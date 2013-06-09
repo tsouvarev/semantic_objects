@@ -40,13 +40,13 @@ class Thing(object):
             if not self.factory.query.create_object(uri, self.__class__.uri):
                 raise Exception("Could not create such object")
 
-        self.uri = unicode(uri)
+        self.uri = URIRef(uri)
 
     @classmethod
     def get_objects(cls):
 
         objects = cls.factory.query.all_resources(cls.uri)
-        return [cls(x) for x in objects]
+        return [cls.factory.get_object(x) for x in objects]
 
     @classmethod
     def filter(cls, *args, **kwargs):
@@ -55,7 +55,7 @@ class Thing(object):
             kwargs.update(args[0])
 
         objects = cls.factory.query.get_class_objects_by_attr_value(cls.uri, **kwargs)
-        return [cls(x) for x in objects]
+        return [cls.factory.get_object(x) for x in objects]
 
     @classmethod
     def get_subclasses(cls):
@@ -65,6 +65,9 @@ class Thing(object):
 
     def __repr__(self):
         return "object " + split_uri(self.uri)[1]
+
+    def __eq__(self, other):
+        return self.uri == other.uri
 
 
 class Factory(object):

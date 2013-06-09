@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# one ring to rule them all
 from pprint import pformat
 from django.utils.html import escape
 from rdflib.term import XSDToPython, URIRef, _XSD_PFX

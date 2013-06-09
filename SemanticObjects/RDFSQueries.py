@@ -303,3 +303,42 @@ class RDFSQueries(object):
         }
 
         return self.insert(q)["boolean"]
+
+    def delete_data(self, data):
+        q = """
+                delete data
+                {
+                    %(data)s
+                }
+            """ % {
+            "data": ["<%s> <%s> <%s> ." % triplet for triplet in data]
+        }
+
+        return self.insert(q)["boolean"]
+
+    @default_to(None)
+    def delete_object(self, object_uri, class_uri):
+        q = """
+                dalete data
+                {
+                    <%(object_uri)s> a <%(class_uri)s>
+                }
+            """ % {
+            "object_uri": object_uri,
+            "class_uri": class_uri,
+        }
+
+        return self.insert(q)["boolean"]
+
+    @default_to(None)
+    def delete_class(self, class_uri):
+        q = """
+                delete data
+                {
+                    <%(class_uri)s> a rdfs:Class
+                }
+            """ % {
+            "class_uri": class_uri,
+        }
+
+        return self.insert(q)["boolean"]
