@@ -69,6 +69,12 @@ class Thing(object):
     def __eq__(self, other):
         return self.uri == other.uri
 
+    def __getattribute__(self, item):
+        res = super(Thing, self).__getattribute__(item)
+        if callable(res):
+            return None
+        return res
+
 
 class Factory(object):
 
